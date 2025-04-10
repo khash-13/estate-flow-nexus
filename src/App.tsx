@@ -9,8 +9,12 @@ import Login from "./pages/Login";
 import Unauthorized from "./pages/Unauthorized";
 import MessagingPage from "./pages/MessagingPage";
 import Properties from "./pages/Properties";
+import PropertyDetails from "./pages/Properties/PropertyDetails";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./contexts/AuthContext";
+import Invoices from "./pages/Invoices";
+import Payments from "./pages/Payments";
+import Reports from "./pages/Reports";
 
 const queryClient = new QueryClient();
 
@@ -26,7 +30,15 @@ const App = () => (
             <Route path="/unauthorized" element={<Unauthorized />} />
             <Route path="/" element={<Dashboard />} />
             <Route path="/messaging" element={<MessagingPage />} />
+            
+            {/* Property Routes */}
             <Route path="/properties" element={<Properties />} />
+            <Route path="/properties/:propertyId" element={<PropertyDetails />} />
+            
+            {/* Accountant Routes */}
+            <Route path="/invoices" element={<Invoices />} />
+            <Route path="/payments" element={<Payments />} />
+            <Route path="/reports" element={<Reports />} />
             
             {/* Redirect index to dashboard */}
             <Route path="/index" element={<Navigate to="/" replace />} />

@@ -8,6 +8,7 @@ import TeamLeadDashboard from "./dashboards/TeamLeadDashboard";
 import AgentDashboard from "./dashboards/AgentDashboard";
 import SiteInchargeDashboard from "./dashboards/SiteInchargeDashboard";
 import CustomerDashboard from "./dashboards/CustomerDashboard";
+import AccountantDashboard from "./dashboards/AccountantDashboard";
 import { Loader2 } from "lucide-react";
 
 const Dashboard = () => {
@@ -40,7 +41,7 @@ const Dashboard = () => {
       case "contractor":
         return <SiteInchargeDashboard />;
       case "accountant":
-        return <AdminDashboard />;
+        return <AccountantDashboard />;
       case "customer_purchased":
       case "customer_prospect":
         return <CustomerDashboard />;
