@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import StatCard from "@/components/dashboard/StatCard";
-import { Home, FileText, CreditCard, Building, MessageCircle, HelpCircle, MapPin } from "lucide-react";
+import { Home, FileText, CreditCard, Building, MessageCircle, HelpCircle, MapPin, Calendar } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
