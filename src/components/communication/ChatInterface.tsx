@@ -149,84 +149,85 @@ const ChatInterface = () => {
                 <TabsTrigger value="direct">Direct</TabsTrigger>
                 <TabsTrigger value="groups">Groups</TabsTrigger>
               </TabsList>
+              <TabsContent value="direct" className="m-0">
+                <ScrollArea className="h-[calc(100vh-15rem)]">
+                  {activeConversations
+                    .filter(c => !c.isGroup)
+                    .map((conversation) => (
+                      <div
+                        key={conversation.id}
+                        className={`flex items-center gap-3 p-3 cursor-pointer hover:bg-muted transition-colors ${
+                          selectedConversation.id === conversation.id ? "bg-muted" : ""
+                        }`}
+                        onClick={() => setSelectedConversation(conversation)}
+                      >
+                        <div className="relative">
+                          <Avatar>
+                            <AvatarImage src={conversation.avatar} />
+                            <AvatarFallback>{conversation.name.charAt(0)}</AvatarFallback>
+                          </Avatar>
+                          {conversation.online && (
+                            <span className="absolute bottom-0 right-0 w-3 h-3 bg-estate-success rounded-full border-2 border-background"></span>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex justify-between items-center">
+                            <p className="font-medium truncate">{conversation.name}</p>
+                            <span className="text-xs text-muted-foreground">{conversation.timestamp}</span>
+                          </div>
+                          <p className="text-sm text-muted-foreground truncate">{conversation.lastMessage}</p>
+                        </div>
+                        {conversation.unread > 0 && (
+                          <Badge className="bg-estate-navy h-5 w-5 flex items-center justify-center rounded-full p-0">
+                            {conversation.unread}
+                          </Badge>
+                        )}
+                      </div>
+                    ))}
+                </ScrollArea>
+              </TabsContent>
+              <TabsContent value="groups" className="m-0">
+                <ScrollArea className="h-[calc(100vh-15rem)]">
+                  {activeConversations
+                    .filter(c => c.isGroup)
+                    .map((conversation) => (
+                      <div
+                        key={conversation.id}
+                        className={`flex items-center gap-3 p-3 cursor-pointer hover:bg-muted transition-colors ${
+                          selectedConversation.id === conversation.id ? "bg-muted" : ""
+                        }`}
+                        onClick={() => setSelectedConversation(conversation)}
+                      >
+                        <Avatar>
+                          <AvatarImage src={conversation.avatar} />
+                          <AvatarFallback>{conversation.name.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex justify-between items-center">
+                            <div className="flex items-center">
+                              <p className="font-medium truncate">{conversation.name}</p>
+                              <Badge variant="outline" className="ml-2 text-xs">
+                                {conversation.members}
+                              </Badge>
+                            </div>
+                            <span className="text-xs text-muted-foreground">{conversation.timestamp}</span>
+                          </div>
+                          <p className="text-sm text-muted-foreground truncate">{conversation.lastMessage}</p>
+                        </div>
+                        {conversation.unread > 0 && (
+                          <Badge className="bg-estate-navy h-5 w-5 flex items-center justify-center rounded-full p-0">
+                            {conversation.unread}
+                          </Badge>
+                        )}
+                      </div>
+                    ))}
+                </ScrollArea>
+              </TabsContent>
             </Tabs>
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          <TabsContent value="direct" className="m-0">
-            <ScrollArea className="h-[calc(100vh-15rem)]">
-              {activeConversations
-                .filter(c => !c.isGroup)
-                .map((conversation) => (
-                  <div
-                    key={conversation.id}
-                    className={`flex items-center gap-3 p-3 cursor-pointer hover:bg-muted transition-colors ${
-                      selectedConversation.id === conversation.id ? "bg-muted" : ""
-                    }`}
-                    onClick={() => setSelectedConversation(conversation)}
-                  >
-                    <div className="relative">
-                      <Avatar>
-                        <AvatarImage src={conversation.avatar} />
-                        <AvatarFallback>{conversation.name.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      {conversation.online && (
-                        <span className="absolute bottom-0 right-0 w-3 h-3 bg-estate-success rounded-full border-2 border-background"></span>
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-center">
-                        <p className="font-medium truncate">{conversation.name}</p>
-                        <span className="text-xs text-muted-foreground">{conversation.timestamp}</span>
-                      </div>
-                      <p className="text-sm text-muted-foreground truncate">{conversation.lastMessage}</p>
-                    </div>
-                    {conversation.unread > 0 && (
-                      <Badge className="bg-estate-navy h-5 w-5 flex items-center justify-center rounded-full p-0">
-                        {conversation.unread}
-                      </Badge>
-                    )}
-                  </div>
-                ))}
-            </ScrollArea>
-          </TabsContent>
-          <TabsContent value="groups" className="m-0">
-            <ScrollArea className="h-[calc(100vh-15rem)]">
-              {activeConversations
-                .filter(c => c.isGroup)
-                .map((conversation) => (
-                  <div
-                    key={conversation.id}
-                    className={`flex items-center gap-3 p-3 cursor-pointer hover:bg-muted transition-colors ${
-                      selectedConversation.id === conversation.id ? "bg-muted" : ""
-                    }`}
-                    onClick={() => setSelectedConversation(conversation)}
-                  >
-                    <Avatar>
-                      <AvatarImage src={conversation.avatar} />
-                      <AvatarFallback>{conversation.name.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-center">
-                        <div className="flex items-center">
-                          <p className="font-medium truncate">{conversation.name}</p>
-                          <Badge variant="outline" className="ml-2 text-xs">
-                            {conversation.members}
-                          </Badge>
-                        </div>
-                        <span className="text-xs text-muted-foreground">{conversation.timestamp}</span>
-                      </div>
-                      <p className="text-sm text-muted-foreground truncate">{conversation.lastMessage}</p>
-                    </div>
-                    {conversation.unread > 0 && (
-                      <Badge className="bg-estate-navy h-5 w-5 flex items-center justify-center rounded-full p-0">
-                        {conversation.unread}
-                      </Badge>
-                    )}
-                  </div>
-                ))}
-            </ScrollArea>
-          </TabsContent>
+          {/* The TabsContent elements have been moved inside the Tabs component */}
         </CardContent>
       </Card>
 
