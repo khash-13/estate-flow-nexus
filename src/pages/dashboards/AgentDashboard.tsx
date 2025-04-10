@@ -1,12 +1,15 @@
 
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import StatCard from "@/components/dashboard/StatCard";
 import ActivityFeed from "@/components/dashboard/ActivityFeed";
-import { UserPlus, Calendar, MapPin, Clock, PhoneCall, Users } from "lucide-react";
+import { UserPlus, Calendar, MapPin, Clock, PhoneCall, Users, FileText, CreditCard, Car } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 // Sample data
 const recentActivities = [
@@ -108,13 +111,79 @@ const leads = [
 ];
 
 const AgentDashboard = () => {
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
+
+  const handleBookingSiteVisit = () => {
+    toast.success("Site visit booking initiated. Please complete the form.");
+    setIsBookingOpen(true);
+  };
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Agent Dashboard</h1>
-        <p className="text-muted-foreground">
-          Manage your leads and schedule
-        </p>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold">Agent Dashboard</h1>
+          <p className="text-muted-foreground">
+            Manage your leads and schedule
+          </p>
+        </div>
+        <Button 
+          onClick={handleBookingSiteVisit}
+          className="bg-estate-gold hover:bg-estate-gold/90 text-white"
+          size="lg"
+        >
+          <MapPin className="mr-2 h-5 w-5" />
+          Book Site Visit
+        </Button>
+      </div>
+
+      {/* Quick Access Links */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 gap-4">
+        <Link to="/leads">
+          <Button variant="outline" className="w-full justify-start h-auto py-4">
+            <UserPlus className="mr-2 h-5 w-5 text-estate-navy" />
+            <div className="text-left">
+              <p className="font-medium">Lead Management</p>
+              <p className="text-xs text-muted-foreground">Manage prospects</p>
+            </div>
+          </Button>
+        </Link>
+        <Link to="/schedule">
+          <Button variant="outline" className="w-full justify-start h-auto py-4">
+            <Calendar className="mr-2 h-5 w-5 text-estate-teal" />
+            <div className="text-left">
+              <p className="font-medium">My Schedule</p>
+              <p className="text-xs text-muted-foreground">View appointments</p>
+            </div>
+          </Button>
+        </Link>
+        <Link to="/visits">
+          <Button variant="outline" className="w-full justify-start h-auto py-4">
+            <Car className="mr-2 h-5 w-5 text-estate-gold" />
+            <div className="text-left">
+              <p className="font-medium">Site Visits</p>
+              <p className="text-xs text-muted-foreground">Car allocation</p>
+            </div>
+          </Button>
+        </Link>
+        <Link to="/documents">
+          <Button variant="outline" className="w-full justify-start h-auto py-4">
+            <FileText className="mr-2 h-5 w-5 text-estate-navy" />
+            <div className="text-left">
+              <p className="font-medium">Documents</p>
+              <p className="text-xs text-muted-foreground">Client records</p>
+            </div>
+          </Button>
+        </Link>
+        <Link to="/commissions">
+          <Button variant="outline" className="w-full justify-start h-auto py-4">
+            <CreditCard className="mr-2 h-5 w-5 text-estate-success" />
+            <div className="text-left">
+              <p className="font-medium">My Commission</p>
+              <p className="text-xs text-muted-foreground">Earnings report</p>
+            </div>
+          </Button>
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -151,7 +220,7 @@ const AgentDashboard = () => {
                 const taskIcons = {
                   call: <PhoneCall className="h-4 w-4" />,
                   visit: <MapPin className="h-4 w-4" />,
-                  document: <Calendar className="h-4 w-4" />,
+                  document: <FileText className="h-4 w-4" />,
                 };
                 
                 const priorityColors = {
@@ -186,7 +255,9 @@ const AgentDashboard = () => {
                 );
               })}
               <div className="flex justify-center pt-4">
-                <Button variant="outline">View All Tasks</Button>
+                <Link to="/schedule">
+                  <Button variant="outline">View All Tasks</Button>
+                </Link>
               </div>
             </CardContent>
           </Card>
@@ -195,8 +266,11 @@ const AgentDashboard = () => {
       </div>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Active Leads</CardTitle>
+          <Link to="/leads">
+            <Button variant="outline" size="sm">View All Leads</Button>
+          </Link>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
@@ -259,6 +333,28 @@ const AgentDashboard = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Site Visit Booking Dialog */}
+      <Dialog open={isBookingOpen} onOpenChange={setIsBookingOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Book a Site Visit</DialogTitle>
+            <DialogDescription>
+              Schedule a site visit for your client. Complete the form below to book a vehicle and a time slot.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid grid-cols-1 gap-4 py-4">
+            <p className="text-sm font-medium">This would redirect to the full booking form on the Site Visits page.</p>
+            <p className="text-sm text-muted-foreground">For demonstration purposes, click the button below to be redirected.</p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsBookingOpen(false)}>Cancel</Button>
+            <Link to="/visits">
+              <Button>Go to Site Visit Booking</Button>
+            </Link>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

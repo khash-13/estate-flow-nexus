@@ -16,6 +16,13 @@ import Invoices from "./pages/Invoices";
 import Payments from "./pages/Payments";
 import Reports from "./pages/Reports";
 
+// Agent specific pages
+import LeadManagement from "./pages/agent/LeadManagement";
+import MySchedule from "./pages/agent/MySchedule";
+import SiteVisits from "./pages/agent/SiteVisits";
+import AgentDocuments from "./pages/agent/AgentDocuments";
+import MyCommissions from "./pages/agent/MyCommissions";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -34,6 +41,13 @@ const App = () => (
             {/* Property Routes */}
             <Route path="/properties" element={<Properties />} />
             <Route path="/properties/:propertyId" element={<PropertyDetails />} />
+            
+            {/* Agent Routes */}
+            <Route path="/leads" element={<LeadManagement />} />
+            <Route path="/schedule" element={<MySchedule />} />
+            <Route path="/visits" element={<SiteVisits />} />
+            <Route path="/documents" element={<AgentDocuments />} />
+            <Route path="/commissions" element={<MyCommissions />} />
             
             {/* Accountant Routes */}
             <Route path="/invoices" element={<Invoices />} />
