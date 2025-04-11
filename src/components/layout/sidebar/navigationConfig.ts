@@ -1,0 +1,103 @@
+
+import { 
+  BarChart3, Building, Users, Home, FileText, MessageCircle, 
+  Calendar, Settings, CreditCard, Map, CheckSquare, UserPlus, 
+  ClipboardList, HelpCircle, LayoutDashboard, Briefcase
+} from "lucide-react";
+import { UserRole } from "@/contexts/AuthContext";
+
+// Define navigation items for each role
+export const navigationByRole: Record<UserRole, Array<{ to: string; icon: React.ElementType; label: string; }>> = {
+  owner: [
+    { to: "/", icon: LayoutDashboard, label: "Executive Dashboard" },
+    { to: "/analytics", icon: BarChart3, label: "Business Analytics" },
+    { to: "/properties", icon: Building, label: "Properties" },
+    { to: "/users", icon: Users, label: "User Management" },
+    { to: "/sales", icon: CreditCard, label: "Sales Overview" },
+    { to: "/operations", icon: CheckSquare, label: "Operations" },
+    { to: "/finances", icon: CreditCard, label: "Finances" },
+    { to: "/messaging", icon: MessageCircle, label: "Communications" },
+    { to: "/settings", icon: Settings, label: "System Settings" },
+  ],
+  admin: [
+    { to: "/", icon: LayoutDashboard, label: "Admin Dashboard" },
+    { to: "/users", icon: Users, label: "User Management" },
+    { to: "/properties", icon: Building, label: "Properties" },
+    { to: "/content", icon: FileText, label: "CMS" },
+    { to: "/messaging", icon: MessageCircle, label: "Communications" },
+    { to: "/settings", icon: Settings, label: "System Config" },
+  ],
+  sales_manager: [
+    { to: "/", icon: LayoutDashboard, label: "Sales Dashboard" },
+    { to: "/pipeline", icon: BarChart3, label: "Sales Pipeline" },
+    { to: "/team", icon: Users, label: "Team Management" },
+    { to: "/commissions", icon: CreditCard, label: "Commissions" },
+    { to: "/properties", icon: Building, label: "Properties" },
+    { to: "/reports", icon: FileText, label: "Sales Reports" },
+    { to: "/messaging", icon: MessageCircle, label: "Communications" },
+  ],
+  team_lead: [
+    { to: "/", icon: LayoutDashboard, label: "Team Dashboard" },
+    { to: "/team", icon: Users, label: "My Team" },
+    { to: "/visits", icon: Map, label: "Site Visits" },
+    { to: "/vehicles", icon: Briefcase, label: "Car Allocation" },
+    { to: "/approvals", icon: CheckSquare, label: "Approvals" },
+    { to: "/properties", icon: Building, label: "Properties" },
+    { to: "/messaging", icon: MessageCircle, label: "Communications" },
+  ],
+  agent: [
+    { to: "/", icon: LayoutDashboard, label: "Agent Dashboard" },
+    { to: "/leads", icon: UserPlus, label: "Lead Management" },
+    { to: "/schedule", icon: Calendar, label: "My Schedule" },
+    { to: "/visits", icon: Map, label: "Site Visits" },
+    { to: "/documents", icon: FileText, label: "Documents" },
+    { to: "/commissions", icon: CreditCard, label: "My Commissions" },
+    { to: "/properties", icon: Building, label: "Properties" },
+    { to: "/messaging", icon: MessageCircle, label: "Communications" },
+  ],
+  site_incharge: [
+    { to: "/", icon: LayoutDashboard, label: "Site Dashboard" },
+    { to: "/quality", icon: CheckSquare, label: "Quality Assurance" },
+    { to: "/milestones", icon: ClipboardList, label: "Construction Milestones" },
+    { to: "/contractors", icon: Users, label: "Contractors" },
+    { to: "/inspections", icon: Map, label: "Site Inspections" },
+    { to: "/documents", icon: FileText, label: "Documentation" },
+    { to: "/invoices", icon: CreditCard, label: "Invoice Approvals" },
+    { to: "/messaging", icon: MessageCircle, label: "Communications" },
+  ],
+  contractor: [
+    { to: "/", icon: LayoutDashboard, label: "Projects Dashboard" },
+    { to: "/projects", icon: Building, label: "My Projects" },
+    { to: "/milestones", icon: ClipboardList, label: "Milestones" },
+    { to: "/materials", icon: Briefcase, label: "Materials" },
+    { to: "/invoices", icon: CreditCard, label: "Invoices" },
+    { to: "/messaging", icon: MessageCircle, label: "Communications" },
+  ],
+  accountant: [
+    { to: "/", icon: LayoutDashboard, label: "Finance Dashboard" },
+    { to: "/invoices", icon: FileText, label: "Invoice Management" },
+    { to: "/payments", icon: CreditCard, label: "Payments" },
+    { to: "/reports", icon: BarChart3, label: "Financial Reports" },
+    { to: "/budgets", icon: ClipboardList, label: "Budget Tracking" },
+    { to: "/taxes", icon: FileText, label: "Tax Documents" },
+    { to: "/messaging", icon: MessageCircle, label: "Communications" },
+  ],
+  customer_purchased: [
+    { to: "/", icon: LayoutDashboard, label: "My Dashboard" },
+    { to: "/properties", icon: Home, label: "My Properties" },
+    { to: "/documents", icon: FileText, label: "My Documents" },
+    { to: "/payments", icon: CreditCard, label: "Payment History" },
+    { to: "/progress", icon: Building, label: "Construction Progress" },
+    { to: "/support", icon: HelpCircle, label: "Support" },
+    { to: "/messaging", icon: MessageCircle, label: "Messages" },
+  ],
+  customer_prospect: [
+    { to: "/", icon: LayoutDashboard, label: "Dashboard" },
+    { to: "/browse", icon: Building, label: "Browse Properties" },
+    { to: "/saved", icon: Home, label: "Saved Properties" },
+    { to: "/visits", icon: Calendar, label: "Site Visits" },
+    { to: "/documents", icon: FileText, label: "My Documents" },
+    { to: "/status", icon: ClipboardList, label: "Application Status" },
+    { to: "/support", icon: HelpCircle, label: "Support" },
+  ],
+};
