@@ -2,7 +2,9 @@
 import { 
   BarChart3, Building, Users, Home, FileText, MessageCircle, 
   Calendar, Settings, CreditCard, Map, CheckSquare, UserPlus, 
-  ClipboardList, HelpCircle, LayoutDashboard, Briefcase
+  ClipboardList, HelpCircle, LayoutDashboard, Briefcase, 
+  Hammer, Construction, ListTodo, Receipt, Camera, AlertTriangle,
+  Clock, Gauge, CheckCircle
 } from "lucide-react";
 import { UserRole } from "@/contexts/AuthContext";
 
@@ -57,20 +59,26 @@ export const navigationByRole: Record<UserRole, Array<{ to: string; icon: React.
   ],
   site_incharge: [
     { to: "/", icon: LayoutDashboard, label: "Site Dashboard" },
-    { to: "/quality", icon: CheckSquare, label: "Quality Assurance" },
-    { to: "/milestones", icon: ClipboardList, label: "Construction Milestones" },
+    { to: "/projects", icon: Building, label: "Projects Overview" },
+    { to: "/verifications", icon: CheckCircle, label: "Task Verifications" },
+    { to: "/quality", icon: AlertTriangle, label: "Quality Control" },
+    { to: "/inspections", icon: Camera, label: "Site Inspections" },
+    { to: "/schedule", icon: Calendar, label: "Inspection Schedule" },
     { to: "/contractors", icon: Users, label: "Contractors" },
-    { to: "/inspections", icon: Map, label: "Site Inspections" },
-    { to: "/documents", icon: FileText, label: "Documentation" },
-    { to: "/invoices", icon: CreditCard, label: "Invoice Approvals" },
+    { to: "/progress", icon: Gauge, label: "Construction Progress" },
+    { to: "/reports", icon: FileText, label: "Site Reports" },
     { to: "/messaging", icon: MessageCircle, label: "Communications" },
   ],
   contractor: [
-    { to: "/", icon: LayoutDashboard, label: "Projects Dashboard" },
+    { to: "/", icon: LayoutDashboard, label: "Contractor Dashboard" },
     { to: "/projects", icon: Building, label: "My Projects" },
-    { to: "/milestones", icon: ClipboardList, label: "Milestones" },
-    { to: "/materials", icon: Briefcase, label: "Materials" },
-    { to: "/invoices", icon: CreditCard, label: "Invoices" },
+    { to: "/tasks", icon: ListTodo, label: "Task Management" },
+    { to: "/timeline", icon: Clock, label: "Construction Timeline" },
+    { to: "/materials", icon: Construction, label: "Materials" },
+    { to: "/labor", icon: Hammer, label: "Labor Management" },
+    { to: "/invoices", icon: Receipt, label: "Invoices" },
+    { to: "/evidence", icon: Camera, label: "Photo Evidence" },
+    { to: "/documents", icon: FileText, label: "Documents" },
     { to: "/messaging", icon: MessageCircle, label: "Communications" },
   ],
   accountant: [

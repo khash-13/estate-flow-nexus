@@ -92,6 +92,22 @@ const MOCK_USERS: Record<string, User & { password: string }> = {
     password: "password",
     avatar: "https://ui-avatars.com/api/?name=Jennifer+Martinez&background=4299E1&color=fff",
   },
+  "contractor@example.com": {
+    id: "7",
+    name: "David Williams",
+    email: "contractor@example.com",
+    role: "contractor",
+    password: "password",
+    avatar: "https://ui-avatars.com/api/?name=David+Williams&background=ED8936&color=fff",
+  },
+  "accountant@example.com": {
+    id: "8",
+    name: "Lisa Thompson",
+    email: "accountant@example.com",
+    role: "accountant",
+    password: "password",
+    avatar: "https://ui-avatars.com/api/?name=Lisa+Thompson&background=9F7AEA&color=fff",
+  },
 };
 
 // Create the provider component
