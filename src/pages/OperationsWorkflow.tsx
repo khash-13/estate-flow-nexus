@@ -14,9 +14,12 @@ import {
   CheckCircle2, Clock, AlertTriangle, XCircle,
   CalendarDays, ClipboardList, Building, TrendingUp,
   BarChart2, ArrowUpRight, ArrowRight, PlusCircle,
-  Calendar, Truck, Users
+  Calendar, Truck, Users, Plus, Workflow, ListChecks
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import AddConstructionTaskDialog from "@/components/operations/AddConstructionTaskDialog";
+import ConstructionTaskList from "@/components/operations/ConstructionTaskList";
+import ConstructionPhaseViewer from "@/components/operations/ConstructionPhaseViewer";
 
 // Sample data for projects
 const constructionProjects = [
@@ -121,6 +124,8 @@ const issuesData = [
 
 const OperationsWorkflow = () => {
   const [projects] = useState(constructionProjects);
+  const [showAddTaskDialog, setShowAddTaskDialog] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<string | null>(null);
 
   const getStatusBadge = (status: string) => {
     switch(status) {
@@ -175,6 +180,11 @@ const OperationsWorkflow = () => {
     });
   };
 
+  const handleAddTask = (projectId: string) => {
+    setSelectedProject(projectId);
+    setShowAddTaskDialog(true);
+  };
+
   return (
     <MainLayout>
       <div className="space-y-6">
@@ -196,6 +206,7 @@ const OperationsWorkflow = () => {
         <Tabs defaultValue="projects" className="w-full">
           <TabsList className="mb-4">
             <TabsTrigger value="projects">Projects</TabsTrigger>
+            <TabsTrigger value="tasks">Construction Tasks</TabsTrigger>
             <TabsTrigger value="milestones">Milestones</TabsTrigger>
             <TabsTrigger value="issues">Issues</TabsTrigger>
             <TabsTrigger value="resources">Resources</TabsTrigger>
@@ -254,6 +265,14 @@ const OperationsWorkflow = () => {
                     </div>
 
                     <div className="mt-6 flex justify-end">
+                      <Button 
+                        variant="outline" 
+                        onClick={() => handleAddTask(project.id)} 
+                        className="mr-2"
+                      >
+                        <Plus className="mr-2 h-4 w-4" />
+                        Add Construction Task
+                      </Button>
                       <Button variant="outline" onClick={handleScheduleInspection} className="mr-2">
                         <Calendar className="mr-2 h-4 w-4" />
                         Schedule Inspection
@@ -267,6 +286,10 @@ const OperationsWorkflow = () => {
                 </Card>
               ))}
             </div>
+          </TabsContent>
+
+          <TabsContent value="tasks">
+            <ConstructionTaskList />
           </TabsContent>
 
           <TabsContent value="milestones">
@@ -385,6 +408,18 @@ const OperationsWorkflow = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Dialog for adding construction tasks */}
+      {showAddTaskDialog && (
+        <AddConstructionTaskDialog 
+          open={showAddTaskDialog}
+          onOpenChange={setShowAddTaskDialog}
+          projectId={selectedProject}
+        />
+      )}
+
+      {/* Construction phase viewer */}
+      <ConstructionPhaseViewer />
     </MainLayout>
   );
 };
