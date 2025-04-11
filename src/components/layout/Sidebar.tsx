@@ -31,8 +31,8 @@ const SidebarLink: React.FC<SidebarLinkProps> = ({
       className={cn(
         "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
         active 
-          ? "bg-sidebar-accent text-sidebar-accent-foreground" 
-          : "text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+          ? "bg-estate-mustard text-estate-blue font-medium" 
+          : "text-white hover:bg-white/10 hover:text-estate-mustard"
       )}
     >
       <Icon className="h-5 w-5 shrink-0" />
@@ -150,29 +150,29 @@ const Sidebar = () => {
   return (
     <div 
       className={cn(
-        "bg-sidebar text-sidebar-foreground border-r border-sidebar-border flex flex-col h-full transition-all duration-300 ease-in-out",
+        "bg-estate-blue text-white border-r border-estate-blue/30 flex flex-col h-full transition-all duration-300 ease-in-out",
         collapsed ? "w-16" : "w-64"
       )}
     >
       {/* Logo/Brand area */}
       <div className={cn(
-        "h-16 flex items-center px-3 border-b border-sidebar-border",
+        "h-16 flex items-center px-3 border-b border-estate-blue/30",
         collapsed ? "justify-center" : "justify-between"
       )}>
         {!collapsed && (
           <Link to="/" className="flex items-center gap-2">
-            <Building className="h-6 w-6 text-estate-gold" />
+            <Building className="h-6 w-6 text-estate-mustard" />
             <span className="font-bold text-lg">EstateFlow</span>
           </Link>
         )}
         {collapsed && (
-          <Building className="h-6 w-6 text-estate-gold" />
+          <Building className="h-6 w-6 text-estate-mustard" />
         )}
         
         <button
           onClick={() => setCollapsed(!collapsed)}
           className={cn(
-            "p-1 rounded-md hover:bg-sidebar-accent",
+            "p-1 rounded-md hover:bg-white/10 text-white",
             collapsed ? "" : ""
           )}
         >
@@ -202,12 +202,12 @@ const Sidebar = () => {
 
       {/* Bottom area - could contain help section, version, etc. */}
       <div className={cn(
-        "p-3 border-t border-sidebar-border",
+        "p-3 border-t border-estate-blue/30",
         collapsed ? "text-center" : ""
       )}>
         <Link
           to="/help"
-          className="flex items-center gap-2 text-sm text-sidebar-foreground/80 hover:text-sidebar-foreground rounded-md px-2 py-1.5"
+          className="flex items-center gap-2 text-sm text-white hover:text-estate-mustard rounded-md px-2 py-1.5"
         >
           <HelpCircle className="h-5 w-5" />
           {!collapsed && <span>Help & Support</span>}

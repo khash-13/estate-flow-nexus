@@ -15,16 +15,16 @@ interface StatCardProps {
 
 const StatCard = ({ title, value, icon, trend, className }: StatCardProps) => {
   return (
-    <Card className={cn("overflow-hidden", className)}>
+    <Card className={cn("overflow-hidden border-estate-blue/10", className)}>
       <CardContent className="p-6">
         <div className="flex justify-between items-start">
           <div>
             <p className="text-sm font-medium text-muted-foreground mb-1">{title}</p>
-            <h3 className="text-2xl font-bold">{value}</h3>
+            <h3 className="text-2xl font-bold text-estate-blue">{value}</h3>
             {trend && (
               <p className={cn(
                 "text-xs font-medium flex items-center mt-1",
-                trend.isPositive ? "text-green-600" : "text-red-600"
+                trend.isPositive ? "text-estate-lime" : "text-estate-tomato"
               )}>
                 <span className="mr-1">
                   {trend.isPositive ? "↑" : "↓"}
@@ -33,7 +33,7 @@ const StatCard = ({ title, value, icon, trend, className }: StatCardProps) => {
               </p>
             )}
           </div>
-          <div className="rounded-full p-2 bg-estate-navy/10">
+          <div className="rounded-full p-2 bg-estate-mustard/20 text-estate-blue">
             {icon}
           </div>
         </div>

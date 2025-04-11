@@ -11,7 +11,7 @@
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
+    --primary: 214 47% 40%;
     --primary-foreground: 210 40% 98%;
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
@@ -23,7 +23,7 @@
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
+    --ring: 214 47% 40%;
     --radius: 0.5rem;
   }
 
@@ -34,8 +34,8 @@
     --card-foreground: 210 40% 98%;
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 214 47% 40%;
+    --primary-foreground: 210 40% 98%;
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
     --muted: 217.2 32.6% 17.5%;
@@ -46,7 +46,7 @@
     --destructive-foreground: 210 40% 98%;
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.5% 48%;
+    --ring: 214 47% 40%;
   }
 }
 
@@ -61,18 +61,20 @@
 
 /* Estate App Custom Colors */
 :root {
-  --estate-navy: #1a365d;
-  --estate-teal: #2c7a7b;
-  --estate-gold: #ecc94b;
+  --estate-mustard: #FCD445;
+  --estate-blue: #345995;
+  --estate-lime: #50CB35;
+  --estate-tomato: #FB4D3D;
+  --estate-rose: #CA1551;
 }
 
 /* Sidebar Colors */
 :root {
-  --sidebar: 217.2 32.6% 17.5%; /* Dark blue background */
-  --sidebar-foreground: 210 40% 98%;
-  --sidebar-border: 215 25% 27%;
-  --sidebar-accent: 217.2 91.2% 59.8%; /* Bright blue for active items */
-  --sidebar-accent-foreground: 210 40% 98%;
+  --sidebar: 214 47% 25%;
+  --sidebar-foreground: 0 0% 100%;
+  --sidebar-border: 214 30% 35%;
+  --sidebar-accent: 47 96% 63%;
+  --sidebar-accent-foreground: 214 47% 25%;
 }
 
 /* Scrollable tabs */

@@ -54,7 +54,7 @@ export default {
 					foreground: 'hsl(var(--card-foreground))'
 				},
 				sidebar: {
-					DEFAULT: 'hsl(var(--sidebar-background))',
+					DEFAULT: 'hsl(var(--sidebar))',
 					foreground: 'hsl(var(--sidebar-foreground))',
 					primary: 'hsl(var(--sidebar-primary))',
 					'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
@@ -63,17 +63,19 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Custom colors for our real estate platform
+				// Custom colors for our real estate platform based on the new color palette
 				estate: {
-					navy: '#1A365D',
-					teal: '#2C7A7B',
-					gold: '#ECC94B',
+					mustard: '#FCD445',  // Mustard
+					blue: '#345995',     // YinMn Blue
+					lime: '#50CB35',     // Lime Green
+					tomato: '#FB4D3D',   // Tomato
+					rose: '#CA1551',     // Rose Red
 					lightGray: '#F7FAFC',
 					gray: '#718096',
 					darkGray: '#2D3748',
-					success: '#38A169',
-					error: '#E53E3E',
-					warning: '#ECC94B',
+					success: '#50CB35',  // Using Lime Green for success
+					error: '#FB4D3D',    // Using Tomato for error
+					warning: '#FCD445',  // Using Mustard for warning
 				}
 			},
 			borderRadius: {
