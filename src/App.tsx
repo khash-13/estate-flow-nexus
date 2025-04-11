@@ -16,6 +16,13 @@ import Invoices from "./pages/Invoices";
 import Payments from "./pages/Payments";
 import Reports from "./pages/Reports";
 
+// Owner specific pages
+import BusinessAnalytics from "./pages/BusinessAnalytics";
+import UserManagement from "./pages/UserManagement";
+import SalesOverview from "./pages/SalesOverview";
+import OperationsWorkflow from "./pages/OperationsWorkflow";
+import Finances from "./pages/Finances";
+
 // Agent specific pages
 import LeadManagement from "./pages/agent/LeadManagement";
 import MySchedule from "./pages/agent/MySchedule";
@@ -41,6 +48,13 @@ const App = () => (
             {/* Property Routes */}
             <Route path="/properties" element={<Properties />} />
             <Route path="/properties/:propertyId" element={<PropertyDetails />} />
+            
+            {/* Owner & Admin Routes */}
+            <Route path="/analytics" element={<BusinessAnalytics />} />
+            <Route path="/users" element={<UserManagement />} />
+            <Route path="/sales" element={<SalesOverview />} />
+            <Route path="/operations" element={<OperationsWorkflow />} />
+            <Route path="/finances" element={<Finances />} />
             
             {/* Agent Routes */}
             <Route path="/leads" element={<LeadManagement />} />

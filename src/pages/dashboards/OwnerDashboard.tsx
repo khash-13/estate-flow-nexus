@@ -1,10 +1,12 @@
 
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import StatCard from "@/components/dashboard/StatCard";
 import ActivityFeed from "@/components/dashboard/ActivityFeed";
 import PropertyCard, { PropertyCardProps } from "@/components/dashboard/PropertyCard";
-import { BarChart3, Building, DollarSign, Users, Calendar } from "lucide-react";
+import { BarChart3, Building, DollarSign, Users, Calendar, BarChart, FileText, Briefcase } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   Tabs,
   TabsContent,
@@ -141,41 +143,80 @@ const OwnerDashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard
-          title="Total Properties"
-          value="24"
-          icon={<Building className="h-6 w-6 text-estate-navy" />}
-          trend={{ value: 12.5, isPositive: true }}
-        />
-        <StatCard
-          title="Total Sales Value"
-          value="$14.3M"
-          icon={<DollarSign className="h-6 w-6 text-estate-teal" />}
-          trend={{ value: 8.2, isPositive: true }}
-        />
-        <StatCard
-          title="Active Leads"
-          value="147"
-          icon={<Users className="h-6 w-6 text-estate-gold" />}
-          trend={{ value: 4.1, isPositive: true }}
-        />
-        <StatCard
-          title="Site Visits"
-          value="38"
-          icon={<Calendar className="h-6 w-6 text-estate-navy" />}
-          trend={{ value: 2.3, isPositive: false }}
-        />
+        <Link to="/analytics" className="block">
+          <StatCard
+            title="Total Properties"
+            value="24"
+            icon={<Building className="h-6 w-6 text-estate-navy" />}
+            trend={{ value: 12.5, isPositive: true }}
+          />
+        </Link>
+        <Link to="/sales" className="block">
+          <StatCard
+            title="Total Sales Value"
+            value="$14.3M"
+            icon={<DollarSign className="h-6 w-6 text-estate-teal" />}
+            trend={{ value: 8.2, isPositive: true }}
+          />
+        </Link>
+        <Link to="/users" className="block">
+          <StatCard
+            title="Active Leads"
+            value="147"
+            icon={<Users className="h-6 w-6 text-estate-gold" />}
+            trend={{ value: 4.1, isPositive: true }}
+          />
+        </Link>
+        <Link to="/operations" className="block">
+          <StatCard
+            title="Site Visits"
+            value="38"
+            icon={<Calendar className="h-6 w-6 text-estate-navy" />}
+            trend={{ value: 2.3, isPositive: false }}
+          />
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle>Performance Overview</CardTitle>
+              <CardTitle className="flex items-center">
+                <BarChart className="mr-2 h-5 w-5 text-estate-navy" />
+                Performance Overview
+              </CardTitle>
             </CardHeader>
             <CardContent className="pl-2">
-              <div className="h-80 flex items-center justify-center bg-muted/50 rounded-md">
-                <BarChart3 className="h-16 w-16 text-estate-navy/20" />
+              <div className="flex flex-col space-y-4">
+                <div className="h-64 flex items-center justify-center bg-muted/50 rounded-md">
+                  <BarChart3 className="h-16 w-16 text-estate-navy/20" />
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <Button asChild variant="outline" className="h-auto py-4 flex flex-col">
+                    <Link to="/analytics">
+                      <BarChart className="h-6 w-6 mb-2 text-estate-navy" />
+                      <span>Business Analytics</span>
+                    </Link>
+                  </Button>
+                  <Button asChild variant="outline" className="h-auto py-4 flex flex-col">
+                    <Link to="/users">
+                      <Users className="h-6 w-6 mb-2 text-estate-teal" />
+                      <span>User Management</span>
+                    </Link>
+                  </Button>
+                  <Button asChild variant="outline" className="h-auto py-4 flex flex-col">
+                    <Link to="/sales">
+                      <DollarSign className="h-6 w-6 mb-2 text-estate-gold" />
+                      <span>Sales Overview</span>
+                    </Link>
+                  </Button>
+                  <Button asChild variant="outline" className="h-auto py-4 flex flex-col">
+                    <Link to="/operations">
+                      <Briefcase className="h-6 w-6 mb-2 text-estate-navy" />
+                      <span>Operations</span>
+                    </Link>
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
