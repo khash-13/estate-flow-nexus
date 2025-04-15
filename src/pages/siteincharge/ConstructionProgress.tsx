@@ -293,8 +293,7 @@ const ConstructionProgress = () => {
                             <div className="text-xs">{project.progress}% Complete</div>
                             <Progress 
                               value={project.progress} 
-                              className="h-2" 
-                              indicatorClassName={progressColorClass(project.progress)}
+                              className={`h-2 ${progressColorClass(project.progress)}`} 
                             />
                           </div>
                         </TableCell>
@@ -359,7 +358,10 @@ const ConstructionProgress = () => {
                           <TableCell>
                             <div className="space-y-1">
                               <div className="text-xs">{project.progress}% Complete</div>
-                              <Progress value={project.progress} className="h-2" />
+                              <Progress 
+                                value={project.progress} 
+                                className={`h-2 ${progressColorClass(project.progress)}`} 
+                              />
                             </div>
                           </TableCell>
                           <TableCell>{new Date(project.expectedCompletion).toLocaleDateString()}</TableCell>
@@ -403,7 +405,10 @@ const ConstructionProgress = () => {
                           <TableCell>
                             <div className="space-y-1">
                               <div className="text-xs">{project.progress}% Complete</div>
-                              <Progress value={project.progress} className="h-2" />
+                              <Progress 
+                                value={project.progress} 
+                                className={`h-2 ${progressColorClass(project.progress)}`} 
+                              />
                             </div>
                           </TableCell>
                           <TableCell>{new Date(project.expectedCompletion).toLocaleDateString()}</TableCell>
@@ -447,7 +452,10 @@ const ConstructionProgress = () => {
                           <TableCell>
                             <div className="space-y-1">
                               <div className="text-xs">{project.progress}% Complete</div>
-                              <Progress value={project.progress} className="h-2" />
+                              <Progress 
+                                value={project.progress} 
+                                className={`h-2 ${progressColorClass(project.progress)}`}
+                              />
                             </div>
                           </TableCell>
                           <TableCell>{new Date(project.expectedCompletion).toLocaleDateString()}</TableCell>
