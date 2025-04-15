@@ -2,12 +2,17 @@
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building, CheckSquare, ClipboardList, Calendar, AlertTriangle } from "lucide-react";
+import { Building, CheckSquare, ClipboardList, Calendar, AlertTriangle, Construction, Users, Receipt, Camera, Clock } from "lucide-react";
 
 import ContractorProjectsOverview from "@/components/dashboard/contractor/ContractorProjectsOverview";
 import ContractorTaskList from "@/components/dashboard/contractor/ContractorTaskList";
 import ContractorActivityFeed from "@/components/dashboard/contractor/ContractorActivityFeed";
 import ContractorUpcomingTasks from "@/components/dashboard/contractor/ContractorUpcomingTasks";
+import ContractorTimeline from "@/components/dashboard/contractor/ContractorTimeline";
+import ContractorMaterials from "@/components/dashboard/contractor/ContractorMaterials";
+import ContractorLabor from "@/components/dashboard/contractor/ContractorLabor";
+import ContractorInvoices from "@/components/dashboard/contractor/ContractorInvoices";
+import ContractorPhotoEvidence from "@/components/dashboard/contractor/ContractorPhotoEvidence";
 
 const ContractorDashboard = () => {
   const [selectedTab, setSelectedTab] = useState("overview");
@@ -65,12 +70,17 @@ const ContractorDashboard = () => {
       </div>
 
       <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-4">
-        <TabsList>
+        <TabsList className="flex-wrap">
           <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="projects">My Projects</TabsTrigger>
           <TabsTrigger value="tasks">Task Management</TabsTrigger>
+          <TabsTrigger value="timeline">Timeline</TabsTrigger>
+          <TabsTrigger value="materials">Materials</TabsTrigger>
+          <TabsTrigger value="labor">Labor</TabsTrigger>
           <TabsTrigger value="invoices">Invoices</TabsTrigger>
-          <TabsTrigger value="documents">Documents</TabsTrigger>
+          <TabsTrigger value="evidence">Photo Evidence</TabsTrigger>
         </TabsList>
+        
         <TabsContent value="overview" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <Card className="col-span-2">
@@ -126,6 +136,18 @@ const ContractorDashboard = () => {
             </Card>
           </div>
         </TabsContent>
+
+        <TabsContent value="projects" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>My Projects</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ContractorProjectsOverview />
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
         <TabsContent value="tasks" className="space-y-4">
           <Card>
             <CardHeader>
@@ -136,23 +158,58 @@ const ContractorDashboard = () => {
             </CardContent>
           </Card>
         </TabsContent>
+        
+        <TabsContent value="timeline" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Construction Timeline</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ContractorTimeline />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="materials" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Materials Management</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ContractorMaterials />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="labor" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Labor Management</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ContractorLabor />
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
         <TabsContent value="invoices" className="space-y-4">
           <Card>
             <CardHeader>
               <CardTitle>Invoices</CardTitle>
             </CardHeader>
             <CardContent>
-              <p>Invoice management interface will be implemented here.</p>
+              <ContractorInvoices />
             </CardContent>
           </Card>
         </TabsContent>
-        <TabsContent value="documents" className="space-y-4">
+        
+        <TabsContent value="evidence" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Documents</CardTitle>
+              <CardTitle>Photo Evidence</CardTitle>
             </CardHeader>
             <CardContent>
-              <p>Document management interface will be implemented here.</p>
+              <ContractorPhotoEvidence />
             </CardContent>
           </Card>
         </TabsContent>

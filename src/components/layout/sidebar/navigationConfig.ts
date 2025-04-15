@@ -1,4 +1,3 @@
-
 import { 
   BarChart3, Building, Users, Home, FileText, MessageCircle, 
   Calendar, Settings, CreditCard, Map, CheckSquare, UserPlus, 
@@ -78,7 +77,6 @@ export const navigationByRole: Record<UserRole, Array<{ to: string; icon: React.
     { to: "/labor", icon: Hammer, label: "Labor Management" },
     { to: "/invoices", icon: Receipt, label: "Invoices" },
     { to: "/evidence", icon: Camera, label: "Photo Evidence" },
-    { to: "/documents", icon: FileText, label: "Documents" },
     { to: "/messaging", icon: MessageCircle, label: "Communications" },
   ],
   accountant: [

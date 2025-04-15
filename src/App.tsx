@@ -30,6 +30,15 @@ import SiteVisits from "./pages/agent/SiteVisits";
 import AgentDocuments from "./pages/agent/AgentDocuments";
 import MyCommissions from "./pages/agent/MyCommissions";
 
+// Contractor specific pages
+import ContractorProjects from "./pages/contractor/ContractorProjects";
+import ContractorTasks from "./pages/contractor/ContractorTasks";
+import ContractorTimeline from "./pages/contractor/ContractorTimeline";
+import ContractorMaterials from "./pages/contractor/ContractorMaterials";
+import ContractorLabor from "./pages/contractor/ContractorLabor";
+import ContractorInvoices from "./pages/contractor/ContractorInvoices";
+import ContractorPhotoEvidence from "./pages/contractor/ContractorPhotoEvidence";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -62,6 +71,15 @@ const App = () => (
             <Route path="/visits" element={<SiteVisits />} />
             <Route path="/documents" element={<AgentDocuments />} />
             <Route path="/commissions" element={<MyCommissions />} />
+            
+            {/* Contractor Routes */}
+            <Route path="/projects" element={<ContractorProjects />} />
+            <Route path="/tasks" element={<ContractorTasks />} />
+            <Route path="/timeline" element={<ContractorTimeline />} />
+            <Route path="/materials" element={<ContractorMaterials />} />
+            <Route path="/labor" element={<ContractorLabor />} />
+            <Route path="/invoices" element={<ContractorInvoices />} />
+            <Route path="/evidence" element={<ContractorPhotoEvidence />} />
             
             {/* Accountant Routes */}
             <Route path="/invoices" element={<Invoices />} />
