@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building, CheckSquare, ClipboardList, Calendar, AlertTriangle, Construction, Users, Receipt, Camera, Clock, Plus, Upload, FileInvoice } from "lucide-react";
+import { Building, CheckSquare, ClipboardList, Calendar, AlertTriangle, Construction, Users, Receipt, Camera, Clock, Plus, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 
@@ -48,7 +48,7 @@ const ContractorDashboard = () => {
         <Dialog open={createInvoiceOpen} onOpenChange={setCreateInvoiceOpen}>
           <DialogTrigger asChild>
             <Button className="bg-green-600 hover:bg-green-700">
-              <FileInvoice className="mr-2 h-4 w-4" />
+              <Receipt className="mr-2 h-4 w-4" />
               Create Invoice
             </Button>
           </DialogTrigger>

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { 
   DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription 
@@ -24,7 +23,6 @@ const TaskVerificationDialog = ({ onOpenChange, taskId }: TaskVerificationDialog
   const [quality, setQuality] = useState<"excellent" | "good" | "acceptable" | "poor">("good");
   const [photos, setPhotos] = useState<File[]>([]);
   
-  // Task details (in a real app, this would be fetched from an API)
   const task = {
     id: taskId || "t1",
     title: "Foundation concrete pouring",
@@ -39,16 +37,13 @@ const TaskVerificationDialog = ({ onOpenChange, taskId }: TaskVerificationDialog
     ]
   };
   
-  // Handle file upload
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      // Convert FileList to array and append to existing photos
       const newFiles = Array.from(e.target.files);
       setPhotos(prevPhotos => [...prevPhotos, ...newFiles]);
     }
   };
   
-  // Remove a photo from the list
   const removePhoto = (index: number) => {
     setPhotos(prevPhotos => prevPhotos.filter((_, i) => i !== index));
   };
@@ -61,9 +56,6 @@ const TaskVerificationDialog = ({ onOpenChange, taskId }: TaskVerificationDialog
       return;
     }
     
-    // In a real app, we would submit the verification data to an API
-    
-    // Show success message
     toast.success(`Task ${verificationStatus}`, {
       description: verificationStatus === "approved" 
         ? "The task has been approved and sent for payment processing"
@@ -72,7 +64,6 @@ const TaskVerificationDialog = ({ onOpenChange, taskId }: TaskVerificationDialog
         : "The task has been sent back for rework. Contractor has been notified."
     });
     
-    // Reset form and close dialog
     setVerificationStatus("approved");
     setNotes("");
     setQuality("good");
@@ -258,7 +249,7 @@ const TaskVerificationDialog = ({ onOpenChange, taskId }: TaskVerificationDialog
           </Button>
           <Button 
             type="submit" 
-            variant={verificationStatus === "approved" ? "default" : verificationStatus === "rework" ? "warning" : "destructive"}
+            variant={verificationStatus === "approved" ? "default" : verificationStatus === "rework" ? "secondary" : "destructive"}
           >
             Submit Verification
           </Button>
