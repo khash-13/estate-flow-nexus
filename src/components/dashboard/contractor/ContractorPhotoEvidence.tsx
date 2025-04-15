@@ -180,7 +180,7 @@ const ContractorPhotoEvidence = () => {
                   </div>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Projects</SelectItem>
+                  <SelectItem value="all-projects">All Projects</SelectItem>
                   {projects.map(project => (
                     <SelectItem key={project} value={project}>{project}</SelectItem>
                   ))}
@@ -195,7 +195,7 @@ const ContractorPhotoEvidence = () => {
                   </div>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Categories</SelectItem>
+                  <SelectItem value="all-categories">All Categories</SelectItem>
                   {categories.map(category => (
                     <SelectItem key={category} value={category}>{category}</SelectItem>
                   ))}
@@ -294,3 +294,4 @@ const ContractorPhotoEvidence = () => {
 };
 
 export default ContractorPhotoEvidence;
+

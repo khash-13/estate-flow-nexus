@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Table, TableBody, TableCell, TableHead, 
@@ -185,7 +184,7 @@ const TaskVerificationList = () => {
             <SelectValue placeholder="All Projects" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Projects</SelectItem>
+            <SelectItem value="all-projects">All Projects</SelectItem>
             <SelectItem value="Riverside Tower">Riverside Tower</SelectItem>
             <SelectItem value="Valley Heights">Valley Heights</SelectItem>
             <SelectItem value="Green Villa">Green Villa</SelectItem>

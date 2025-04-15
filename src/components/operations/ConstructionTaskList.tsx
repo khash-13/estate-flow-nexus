@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -75,7 +74,6 @@ const ConstructionTaskList = () => {
     }
   };
   
-  // Filter tasks based on selected filters
   const filteredTasks = tasks.filter(task => {
     const matchesPhase = phase ? task.phase === phase : true;
     const matchesStatus = status ? task.status === status : true;
@@ -116,7 +114,7 @@ const ConstructionTaskList = () => {
                   <SelectValue placeholder="All Phases" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Phases</SelectItem>
+                  <SelectItem value="all-phases">All Phases</SelectItem>
                   {Object.entries(CONSTRUCTION_PHASES).map(([key, value]) => (
                     <SelectItem key={key} value={key}>
                       {value.title}
@@ -132,7 +130,7 @@ const ConstructionTaskList = () => {
                   <SelectValue placeholder="All Statuses" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Statuses</SelectItem>
+                  <SelectItem value="all-statuses">All Statuses</SelectItem>
                   <SelectItem value="pending">Pending</SelectItem>
                   <SelectItem value="in_progress">In Progress</SelectItem>
                   <SelectItem value="completed">Completed</SelectItem>
@@ -143,7 +141,6 @@ const ConstructionTaskList = () => {
             </div>
           </div>
           
-          {/* Task list */}
           <div className="space-y-4">
             {filteredTasks.length === 0 ? (
               <p className="text-center text-muted-foreground py-8">No tasks match your filters</p>
