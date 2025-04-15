@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
@@ -139,7 +138,6 @@ const ContractorMaterials = () => {
     return matchesSearch && matchesCategory && matchesProject;
   });
   
-  // Extract unique categories and projects for filters
   const categories = Array.from(new Set(materials.map(m => m.category)));
   const projects = Array.from(new Set(materials.map(m => m.project)));
   
@@ -235,7 +233,7 @@ const ContractorMaterials = () => {
               </div>
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Categories</SelectItem>
+              <SelectItem value="all-categories">All Categories</SelectItem>
               {categories.map(category => (
                 <SelectItem key={category} value={category}>{category}</SelectItem>
               ))}
@@ -250,7 +248,7 @@ const ContractorMaterials = () => {
               </div>
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Projects</SelectItem>
+              <SelectItem value="all-projects">All Projects</SelectItem>
               {projects.map(project => (
                 <SelectItem key={project} value={project}>{project}</SelectItem>
               ))}

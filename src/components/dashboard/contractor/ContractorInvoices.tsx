@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
@@ -140,10 +139,8 @@ const ContractorInvoices = () => {
     return matchesSearch && matchesStatus && matchesProject;
   });
   
-  // Extract unique projects for filters
   const projects = Array.from(new Set(invoices.map(i => i.project)));
   
-  // Calculate total invoice values by status
   const totalInvoiced = invoices.reduce((sum, invoice) => sum + invoice.amount, 0);
   const totalPaid = invoices
     .filter(invoice => invoice.status === 'paid')
@@ -248,7 +245,7 @@ const ContractorInvoices = () => {
               </div>
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Statuses</SelectItem>
+              <SelectItem value="all-statuses">All Statuses</SelectItem>
               <SelectItem value="draft">Draft</SelectItem>
               <SelectItem value="submitted">Submitted</SelectItem>
               <SelectItem value="approved">Approved</SelectItem>
@@ -265,7 +262,7 @@ const ContractorInvoices = () => {
               </div>
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Projects</SelectItem>
+              <SelectItem value="all-projects">All Projects</SelectItem>
               {projects.map(project => (
                 <SelectItem key={project} value={project}>{project}</SelectItem>
               ))}

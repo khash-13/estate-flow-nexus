@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
@@ -147,11 +146,9 @@ const ContractorLabor = () => {
     return matchesSearch && matchesType && matchesProject && matchesStatus;
   });
   
-  // Extract unique team types and projects for filters
   const teamTypes = Array.from(new Set(laborTeams.map(t => t.type)));
   const projects = Array.from(new Set(laborTeams.map(t => t.project)));
   
-  // Calculate total workforce
   const totalWorkforce = laborTeams.reduce((sum, team) => sum + team.size, 0);
   const activeWorkforce = laborTeams
     .filter(team => team.status === 'active')
@@ -239,7 +236,7 @@ const ContractorLabor = () => {
                     </div>
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Types</SelectItem>
+                    <SelectItem value="all-types">All Types</SelectItem>
                     {teamTypes.map(type => (
                       <SelectItem key={type} value={type}>{type}</SelectItem>
                     ))}
@@ -254,7 +251,7 @@ const ContractorLabor = () => {
                     </div>
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Projects</SelectItem>
+                    <SelectItem value="all-projects">All Projects</SelectItem>
                     {projects.map(project => (
                       <SelectItem key={project} value={project}>{project}</SelectItem>
                     ))}
