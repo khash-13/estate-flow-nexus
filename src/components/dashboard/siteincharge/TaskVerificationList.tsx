@@ -6,102 +6,27 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Search, Filter, CheckCircle, XCircle, Camera } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { 
+  Search, Filter, RefreshCw, Camera, CheckCircle, XCircle, AlertCircle
+} from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog } from "@/components/ui/dialog";
+import TaskVerificationDialog from "./TaskVerificationDialog";
+import { toast } from "sonner";
 
 interface VerificationTask {
   id: string;
   title: string;
   project: string;
   unit: string;
-  phase: string;
   contractor: string;
+  phase: string;
   submittedDate: string;
-  deadline: string;
   priority: 'high' | 'medium' | 'low';
-  evidence: {
-    images: string[];
-    notes: string;
-  };
+  status: 'pending_verification' | 'approved' | 'rejected' | 'rework';
 }
-
-const sampleTasks: VerificationTask[] = [
-  {
-    id: 'v1',
-    title: 'Foundation concrete pouring',
-    project: 'Riverside Tower',
-    unit: 'Block A',
-    phase: 'Groundwork and Foundation',
-    contractor: 'ABC Contractors',
-    submittedDate: '2025-04-10',
-    deadline: '2025-04-15',
-    priority: 'high',
-    evidence: {
-      images: [
-        'https://placehold.co/600x400/png?text=Foundation+Photo+1',
-        'https://placehold.co/600x400/png?text=Foundation+Photo+2'
-      ],
-      notes: 'Concrete pouring completed for the entire foundation area. Used M25 grade concrete as per specifications.'
-    }
-  },
-  {
-    id: 'v2',
-    title: 'Electrical conduiting - 2nd Floor',
-    project: 'Valley Heights',
-    unit: 'Block B',
-    phase: 'Electrical Works',
-    contractor: 'ElectraPro Services',
-    submittedDate: '2025-04-09',
-    deadline: '2025-04-12',
-    priority: 'high',
-    evidence: {
-      images: [
-        'https://placehold.co/600x400/png?text=Electrical+Conduit+Photo+1',
-        'https://placehold.co/600x400/png?text=Electrical+Conduit+Photo+2'
-      ],
-      notes: 'All electrical conduits installed according to drawing E2-B. Used 25mm PVC conduits for main lines and 20mm for branches.'
-    }
-  },
-  {
-    id: 'v3',
-    title: 'Wall plastering',
-    project: 'Green Villa',
-    unit: 'Villa 2',
-    phase: 'Masonry Work',
-    contractor: 'BuildRight Construction',
-    submittedDate: '2025-04-08',
-    deadline: '2025-04-16',
-    priority: 'medium',
-    evidence: {
-      images: [
-        'https://placehold.co/600x400/png?text=Wall+Plastering+Photo+1',
-        'https://placehold.co/600x400/png?text=Wall+Plastering+Photo+2'
-      ],
-      notes: 'Completed interior wall plastering with 12mm cement mortar (1:6). All corners finished with aluminum corner beads.'
-    }
-  },
-  {
-    id: 'v4',
-    title: 'Roof waterproofing',
-    project: 'Valley Heights',
-    unit: 'Unit 4',
-    phase: 'Roofing',
-    contractor: 'ABC Contractors',
-    submittedDate: '2025-04-07',
-    deadline: '2025-04-14',
-    priority: 'high',
-    evidence: {
-      images: [
-        'https://placehold.co/600x400/png?text=Waterproofing+Photo+1',
-        'https://placehold.co/600x400/png?text=Waterproofing+Photo+2' 
-      ],
-      notes: 'Applied polymer-modified bitumen membrane waterproofing. Two layers applied with overlap as per specifications.'
-    }
-  }
-];
 
 const priorityColors: Record<string, string> = {
   high: 'bg-red-100 text-red-800',
@@ -109,13 +34,92 @@ const priorityColors: Record<string, string> = {
   low: 'bg-green-100 text-green-800'
 };
 
+const statusColors: Record<string, string> = {
+  pending_verification: 'bg-blue-100 text-blue-800',
+  approved: 'bg-green-100 text-green-800',
+  rejected: 'bg-red-100 text-red-800',
+  rework: 'bg-amber-100 text-amber-800'
+};
+
+// Sample tasks awaiting verification (in a real app, this would come from an API)
+const sampleVerificationTasks: VerificationTask[] = [
+  {
+    id: 'v1',
+    title: 'Foundation concrete pouring',
+    project: 'Riverside Tower',
+    unit: 'Block A',
+    contractor: 'ABC Construction Ltd.',
+    phase: 'Groundwork and Foundation',
+    submittedDate: '2025-04-15',
+    priority: 'high',
+    status: 'pending_verification'
+  },
+  {
+    id: 'v2',
+    title: 'Structural column formwork',
+    project: 'Riverside Tower',
+    unit: 'Block B',
+    contractor: 'ABC Construction Ltd.',
+    phase: 'Structural Framework',
+    submittedDate: '2025-04-15',
+    priority: 'high',
+    status: 'pending_verification'
+  },
+  {
+    id: 'v3',
+    title: 'Wall plastering',
+    project: 'Green Villa',
+    unit: 'Villa 2',
+    contractor: 'XYZ Builders',
+    phase: 'Masonry Work',
+    submittedDate: '2025-04-10',
+    priority: 'medium',
+    status: 'approved'
+  },
+  {
+    id: 'v4',
+    title: 'Electrical conduiting - First Floor',
+    project: 'Valley Heights',
+    unit: 'Unit 3',
+    contractor: 'PowerTech Systems',
+    phase: 'Electrical Works',
+    submittedDate: '2025-04-12',
+    priority: 'medium',
+    status: 'rework'
+  },
+  {
+    id: 'v5',
+    title: 'Roof waterproofing',
+    project: 'Valley Heights',
+    unit: 'Unit 4',
+    contractor: 'Top Shelter Inc.',
+    phase: 'Roofing',
+    submittedDate: '2025-04-05',
+    priority: 'high',
+    status: 'rejected'
+  }
+];
+
 const TaskVerificationList = () => {
-  const [tasks] = useState<VerificationTask[]>(sampleTasks);
+  const [tasks, setTasks] = useState<VerificationTask[]>(sampleVerificationTasks);
   const [filter, setFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTask, setSelectedTask] = useState<VerificationTask | null>(null);
-  
+  const [projectFilter, setProjectFilter] = useState('');
+  const [verificationDialogOpen, setVerificationDialogOpen] = useState(false);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+
   const filteredTasks = tasks.filter(task => {
+    // Apply status filter
+    if (filter !== 'all' && task.status !== filter) {
+      return false;
+    }
+    
+    // Apply project filter
+    if (projectFilter && task.project !== projectFilter) {
+      return false;
+    }
+    
+    // Apply search query
     if (searchQuery && !task.title.toLowerCase().includes(searchQuery.toLowerCase())) {
       return false;
     }
@@ -123,32 +127,83 @@ const TaskVerificationList = () => {
     return true;
   });
 
+  const handleVerify = (taskId: string) => {
+    setSelectedTaskId(taskId);
+    setVerificationDialogOpen(true);
+  };
+
+  const handleQuickAction = (taskId: string, action: 'approve' | 'reject' | 'rework') => {
+    // Update task status
+    setTasks(prevTasks => 
+      prevTasks.map(task => 
+        task.id === taskId 
+          ? { 
+              ...task, 
+              status: action === 'approve' 
+                ? 'approved' 
+                : action === 'reject' 
+                ? 'rejected' 
+                : 'rework' 
+            } 
+          : task
+      )
+    );
+    
+    // Show notification
+    const task = tasks.find(t => t.id === taskId);
+    
+    if (action === 'approve') {
+      toast.success(`Task approved`, {
+        description: `${task?.title} has been approved and sent for payment processing`
+      });
+    } else if (action === 'reject') {
+      toast.error(`Task rejected`, {
+        description: `${task?.title} has been rejected. Contractor has been notified.`
+      });
+    } else {
+      toast.warning(`Task requires rework`, {
+        description: `${task?.title} has been sent back for rework. Contractor has been notified.`
+      });
+    }
+  };
+
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <div className="flex items-center space-x-2">
-          <div className="relative">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search verifications..."
-              className="pl-8"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          <Button variant="outline" size="sm">
-            <Filter className="h-4 w-4 mr-2" />
-            Filter
-          </Button>
+      <div className="flex flex-wrap gap-3 items-center">
+        <div className="relative flex-1 min-w-[200px]">
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search tasks..."
+            className="pl-8"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </div>
+        
+        <Select value={projectFilter} onValueChange={setProjectFilter}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="All Projects" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">All Projects</SelectItem>
+            <SelectItem value="Riverside Tower">Riverside Tower</SelectItem>
+            <SelectItem value="Valley Heights">Valley Heights</SelectItem>
+            <SelectItem value="Green Villa">Green Villa</SelectItem>
+          </SelectContent>
+        </Select>
+        
+        <Button variant="outline" size="icon">
+          <RefreshCw className="h-4 w-4" />
+        </Button>
       </div>
       
       <Tabs defaultValue="all" onValueChange={setFilter}>
         <TabsList>
-          <TabsTrigger value="all">All Tasks</TabsTrigger>
-          <TabsTrigger value="high">High Priority</TabsTrigger>
-          <TabsTrigger value="medium">Medium Priority</TabsTrigger>
-          <TabsTrigger value="low">Low Priority</TabsTrigger>
+          <TabsTrigger value="all">All</TabsTrigger>
+          <TabsTrigger value="pending_verification">Pending</TabsTrigger>
+          <TabsTrigger value="approved">Approved</TabsTrigger>
+          <TabsTrigger value="rework">Rework</TabsTrigger>
+          <TabsTrigger value="rejected">Rejected</TabsTrigger>
         </TabsList>
       </Tabs>
       
@@ -160,100 +215,96 @@ const TaskVerificationList = () => {
               <TableHead>Project / Unit</TableHead>
               <TableHead>Contractor</TableHead>
               <TableHead>Submitted</TableHead>
-              <TableHead>Deadline</TableHead>
+              <TableHead>Status</TableHead>
               <TableHead>Priority</TableHead>
-              <TableHead className="text-right">Action</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredTasks.map((task) => (
-              <TableRow key={task.id}>
-                <TableCell className="font-medium">{task.title}</TableCell>
-                <TableCell>{task.project} / {task.unit}</TableCell>
-                <TableCell>{task.contractor}</TableCell>
-                <TableCell>{new Date(task.submittedDate).toLocaleDateString()}</TableCell>
-                <TableCell>{new Date(task.deadline).toLocaleDateString()}</TableCell>
-                <TableCell>
-                  <Badge variant="outline" className={priorityColors[task.priority]}>
-                    {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                  <Sheet>
-                    <SheetTrigger asChild>
-                      <Button variant="outline" size="sm" onClick={() => setSelectedTask(task)}>
-                        Review
-                      </Button>
-                    </SheetTrigger>
-                    <SheetContent side="right" className="sm:max-w-xl w-[90%]">
-                      {selectedTask && (
-                        <>
-                          <SheetHeader>
-                            <SheetTitle>Task Verification</SheetTitle>
-                          </SheetHeader>
-                          
-                          <div className="py-6 space-y-6">
-                            <div className="space-y-2">
-                              <h3 className="text-lg font-semibold">{selectedTask.title}</h3>
-                              <div className="flex items-center gap-2">
-                                <Badge variant="outline" className={priorityColors[selectedTask.priority]}>
-                                  {selectedTask.priority.charAt(0).toUpperCase() + selectedTask.priority.slice(1)} Priority
-                                </Badge>
-                                <span className="text-sm text-muted-foreground">
-                                  {selectedTask.project}, {selectedTask.unit}
-                                </span>
-                              </div>
-                              <p className="text-sm">
-                                <span className="font-medium">Contractor:</span> {selectedTask.contractor}
-                              </p>
-                              <p className="text-sm">
-                                <span className="font-medium">Phase:</span> {selectedTask.phase}
-                              </p>
-                            </div>
-                            
-                            <div>
-                              <h4 className="text-sm font-semibold mb-2">Submitted Evidence</h4>
-                              <p className="text-sm mb-3">{selectedTask.evidence.notes}</p>
-                              
-                              <div className="grid grid-cols-2 gap-3">
-                                {selectedTask.evidence.images.map((image, index) => (
-                                  <div key={index} className="border rounded-md overflow-hidden">
-                                    <img src={image} alt={`Evidence ${index + 1}`} className="w-full h-auto" />
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                            
-                            <Card className="p-4 bg-blue-50">
-                              <h4 className="text-sm font-semibold mb-2">Verification Actions</h4>
-                              <div className="space-y-3">
-                                <Button variant="outline" className="w-full justify-start">
-                                  <Camera className="h-4 w-4 mr-2" />
-                                  Take Verification Photos
-                                </Button>
-                                <div className="flex gap-2">
-                                  <Button className="flex-1" variant="default">
-                                    <CheckCircle className="h-4 w-4 mr-2" />
-                                    Approve
-                                  </Button>
-                                  <Button className="flex-1" variant="destructive">
-                                    <XCircle className="h-4 w-4 mr-2" />
-                                    Reject
-                                  </Button>
-                                </div>
-                              </div>
-                            </Card>
-                          </div>
-                        </>
-                      )}
-                    </SheetContent>
-                  </Sheet>
+            {filteredTasks.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} className="text-center py-6 text-muted-foreground">
+                  No tasks found matching your filters
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              filteredTasks.map((task) => (
+                <TableRow key={task.id}>
+                  <TableCell className="font-medium">{task.title}</TableCell>
+                  <TableCell>{task.project} / {task.unit}</TableCell>
+                  <TableCell>{task.contractor}</TableCell>
+                  <TableCell>{new Date(task.submittedDate).toLocaleDateString()}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className={statusColors[task.status]}>
+                      {task.status === 'pending_verification' 
+                        ? 'Pending Verification' 
+                        : task.status.charAt(0).toUpperCase() + task.status.slice(1)}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className={priorityColors[task.priority]}>
+                      {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex justify-end space-x-1">
+                      {task.status === 'pending_verification' && (
+                        <>
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            className="text-green-600 hover:text-green-800 hover:bg-green-100"
+                            title="Approve"
+                            onClick={() => handleQuickAction(task.id, 'approve')}
+                          >
+                            <CheckCircle className="h-4 w-4" />
+                          </Button>
+                          
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            className="text-amber-600 hover:text-amber-800 hover:bg-amber-100"
+                            title="Request Rework"
+                            onClick={() => handleQuickAction(task.id, 'rework')}
+                          >
+                            <AlertCircle className="h-4 w-4" />
+                          </Button>
+                          
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            className="text-red-600 hover:text-red-800 hover:bg-red-100"
+                            title="Reject"
+                            onClick={() => handleQuickAction(task.id, 'reject')}
+                          >
+                            <XCircle className="h-4 w-4" />
+                          </Button>
+                        </>
+                      )}
+                      
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handleVerify(task.id)}
+                      >
+                        <Camera className="h-4 w-4 mr-1" />
+                        {task.status === 'pending_verification' ? 'Verify' : 'View'}
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>
+
+      <Dialog open={verificationDialogOpen} onOpenChange={setVerificationDialogOpen}>
+        <TaskVerificationDialog 
+          onOpenChange={setVerificationDialogOpen}
+          taskId={selectedTaskId || undefined}
+        />
+      </Dialog>
     </div>
   );
 };

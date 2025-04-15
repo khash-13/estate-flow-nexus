@@ -2,7 +2,9 @@
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building, CheckSquare, ClipboardList, Calendar, AlertTriangle, Construction, Users, Receipt, Camera, Clock } from "lucide-react";
+import { Building, CheckSquare, ClipboardList, Calendar, AlertTriangle, Construction, Users, Receipt, Camera, Clock, Plus, Upload, FileInvoice } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 
 import ContractorProjectsOverview from "@/components/dashboard/contractor/ContractorProjectsOverview";
 import ContractorTaskList from "@/components/dashboard/contractor/ContractorTaskList";
@@ -13,9 +15,15 @@ import ContractorMaterials from "@/components/dashboard/contractor/ContractorMat
 import ContractorLabor from "@/components/dashboard/contractor/ContractorLabor";
 import ContractorInvoices from "@/components/dashboard/contractor/ContractorInvoices";
 import ContractorPhotoEvidence from "@/components/dashboard/contractor/ContractorPhotoEvidence";
+import AddTaskDialog from "@/components/dashboard/contractor/AddTaskDialog";
+import CreateInvoiceDialog from "@/components/dashboard/contractor/CreateInvoiceDialog";
+import UploadEvidenceDialog from "@/components/dashboard/contractor/UploadEvidenceDialog";
 
 const ContractorDashboard = () => {
   const [selectedTab, setSelectedTab] = useState("overview");
+  const [addTaskOpen, setAddTaskOpen] = useState(false);
+  const [createInvoiceOpen, setCreateInvoiceOpen] = useState(false);
+  const [uploadEvidenceOpen, setUploadEvidenceOpen] = useState(false);
 
   return (
     <div className="space-y-4 p-8">
@@ -24,6 +32,38 @@ const ContractorDashboard = () => {
         <p className="text-muted-foreground">
           Manage your projects, tasks, and invoices
         </p>
+      </div>
+
+      <div className="flex flex-wrap gap-3 mb-6">
+        <Dialog open={addTaskOpen} onOpenChange={setAddTaskOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-blue-600 hover:bg-blue-700">
+              <Plus className="mr-2 h-4 w-4" />
+              Add New Task
+            </Button>
+          </DialogTrigger>
+          <AddTaskDialog onOpenChange={setAddTaskOpen} />
+        </Dialog>
+
+        <Dialog open={createInvoiceOpen} onOpenChange={setCreateInvoiceOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-green-600 hover:bg-green-700">
+              <FileInvoice className="mr-2 h-4 w-4" />
+              Create Invoice
+            </Button>
+          </DialogTrigger>
+          <CreateInvoiceDialog onOpenChange={setCreateInvoiceOpen} />
+        </Dialog>
+
+        <Dialog open={uploadEvidenceOpen} onOpenChange={setUploadEvidenceOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-amber-600 hover:bg-amber-700">
+              <Camera className="mr-2 h-4 w-4" />
+              Upload Evidence
+            </Button>
+          </DialogTrigger>
+          <UploadEvidenceDialog onOpenChange={setUploadEvidenceOpen} />
+        </Dialog>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

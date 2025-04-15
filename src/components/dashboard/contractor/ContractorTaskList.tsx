@@ -10,12 +10,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { MoreHorizontal, Plus, Search, Filter, RefreshCw } from "lucide-react";
+import { MoreHorizontal, Plus, Search, Filter, RefreshCw, Camera, AlertCircle, FileText } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
+import AddTaskDialog from "./AddTaskDialog";
+import UploadEvidenceDialog from "./UploadEvidenceDialog";
 
 interface Task {
   id: string;
@@ -26,6 +29,8 @@ interface Task {
   status: 'pending' | 'in_progress' | 'completed' | 'approved' | 'rejected';
   deadline: string;
   priority: 'high' | 'medium' | 'low';
+  progress?: number;
+  hasEvidence?: boolean;
 }
 
 const statusColors: Record<string, string> = {
@@ -51,7 +56,9 @@ const sampleTasks: Task[] = [
     phase: 'Groundwork and Foundation',
     status: 'completed',
     deadline: '2025-04-15',
-    priority: 'high'
+    priority: 'high',
+    progress: 100,
+    hasEvidence: true
   },
   {
     id: 't2',
@@ -61,7 +68,9 @@ const sampleTasks: Task[] = [
     phase: 'Structural Framework',
     status: 'in_progress',
     deadline: '2025-04-20',
-    priority: 'high'
+    priority: 'high',
+    progress: 75,
+    hasEvidence: true
   },
   {
     id: 't3',
@@ -71,7 +80,9 @@ const sampleTasks: Task[] = [
     phase: 'Electrical Works',
     status: 'pending',
     deadline: '2025-04-25',
-    priority: 'medium'
+    priority: 'medium',
+    progress: 0,
+    hasEvidence: false
   },
   {
     id: 't4',
@@ -81,7 +92,9 @@ const sampleTasks: Task[] = [
     phase: 'Masonry Work',
     status: 'approved',
     deadline: '2025-04-10',
-    priority: 'medium'
+    priority: 'medium',
+    progress: 100,
+    hasEvidence: true
   },
   {
     id: 't5',
@@ -91,14 +104,19 @@ const sampleTasks: Task[] = [
     phase: 'Roofing',
     status: 'rejected',
     deadline: '2025-04-05',
-    priority: 'high'
+    priority: 'high',
+    progress: 45,
+    hasEvidence: true
   }
 ];
 
 const ContractorTaskList = () => {
-  const [tasks] = useState<Task[]>(sampleTasks);
+  const [tasks, setTasks] = useState<Task[]>(sampleTasks);
   const [filter, setFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [addTaskOpen, setAddTaskOpen] = useState(false);
+  const [uploadEvidenceOpen, setUploadEvidenceOpen] = useState(false);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   
   const form = useForm({
     defaultValues: {
@@ -124,6 +142,35 @@ const ContractorTaskList = () => {
     
     return true;
   });
+
+  const handleStatusChange = (taskId: string, newStatus: Task['status']) => {
+    // Update task status
+    setTasks(prevTasks => 
+      prevTasks.map(task => 
+        task.id === taskId 
+          ? { ...task, status: newStatus } 
+          : task
+      )
+    );
+    
+    // Show notification
+    const task = tasks.find(t => t.id === taskId);
+    
+    if (newStatus === 'completed') {
+      toast.success(`Task marked as completed`, {
+        description: `${task?.title} has been sent for verification by Site In-charge`
+      });
+    } else {
+      toast.success(`Task status updated`, {
+        description: `${task?.title} is now ${newStatus.replace('_', ' ')}`
+      });
+    }
+  };
+
+  const handleUploadEvidence = (taskId: string) => {
+    setSelectedTaskId(taskId);
+    setUploadEvidenceOpen(true);
+  };
 
   return (
     <div className="space-y-4">
@@ -159,95 +206,14 @@ const ContractorTaskList = () => {
           </Button>
         </div>
 
-        <Dialog>
+        <Dialog open={addTaskOpen} onOpenChange={setAddTaskOpen}>
           <DialogTrigger asChild>
             <Button>
               <Plus className="h-4 w-4 mr-2" />
               Add Task
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[525px]">
-            <DialogHeader>
-              <DialogTitle>Create New Task</DialogTitle>
-            </DialogHeader>
-            <Form {...form}>
-              <form className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Task Title</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter task title" {...field} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="project"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Project</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Select project" {...field} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="unit"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Unit</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Select unit" {...field} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="phase"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Construction Phase</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Select phase" {...field} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="deadline"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Deadline</FormLabel>
-                        <FormControl>
-                          <Input type="date" {...field} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                
-                <div className="flex justify-end space-x-2 pt-4">
-                  <Button variant="outline" type="button">Cancel</Button>
-                  <Button type="submit">Create Task</Button>
-                </div>
-              </form>
-            </Form>
-          </DialogContent>
+          <AddTaskDialog onOpenChange={setAddTaskOpen} />
         </Dialog>
       </div>
       
@@ -271,8 +237,9 @@ const ContractorTaskList = () => {
               <TableHead>Phase</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Deadline</TableHead>
+              <TableHead>Progress</TableHead>
               <TableHead>Priority</TableHead>
-              <TableHead className="w-[50px]"></TableHead>
+              <TableHead className="w-[100px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -287,33 +254,68 @@ const ContractorTaskList = () => {
                   </Badge>
                 </TableCell>
                 <TableCell>{new Date(task.deadline).toLocaleDateString()}</TableCell>
+                <TableCell>{task.progress !== undefined ? `${task.progress}%` : '-'}</TableCell>
                 <TableCell>
                   <Badge variant="outline" className={priorityColors[task.priority]}>
                     {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">Open menu</span>
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>View Details</DropdownMenuItem>
-                      <DropdownMenuItem>Edit Task</DropdownMenuItem>
-                      <DropdownMenuItem>Mark as Completed</DropdownMenuItem>
-                      <DropdownMenuItem>Upload Photos</DropdownMenuItem>
-                      <DropdownMenuItem>Generate Invoice</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <div className="flex space-x-1">
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={() => handleUploadEvidence(task.id)}
+                      className={task.hasEvidence ? "text-blue-600 hover:text-blue-800" : ""}
+                    >
+                      <Camera className="h-4 w-4" />
+                    </Button>
+                    
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem>View Details</DropdownMenuItem>
+                        <DropdownMenuItem>Edit Task</DropdownMenuItem>
+                        {task.status === 'pending' && (
+                          <DropdownMenuItem onClick={() => handleStatusChange(task.id, 'in_progress')}>
+                            Mark as In Progress
+                          </DropdownMenuItem>
+                        )}
+                        {(task.status === 'pending' || task.status === 'in_progress') && (
+                          <DropdownMenuItem onClick={() => handleStatusChange(task.id, 'completed')}>
+                            Mark as Completed
+                          </DropdownMenuItem>
+                        )}
+                        {task.status === 'rejected' && (
+                          <DropdownMenuItem onClick={() => handleStatusChange(task.id, 'in_progress')}>
+                            Resume Work
+                          </DropdownMenuItem>
+                        )}
+                        <DropdownMenuItem onClick={() => handleUploadEvidence(task.id)}>
+                          Upload Photos
+                        </DropdownMenuItem>
+                        {task.status === 'approved' && (
+                          <DropdownMenuItem>
+                            Generate Invoice
+                          </DropdownMenuItem>
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </div>
+
+      <Dialog open={uploadEvidenceOpen} onOpenChange={setUploadEvidenceOpen}>
+        <UploadEvidenceDialog onOpenChange={setUploadEvidenceOpen} />
+      </Dialog>
     </div>
   );
 };
