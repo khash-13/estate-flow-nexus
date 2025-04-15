@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Building, CheckCircle2, ClipboardCheck, AlertOctagon, Calendar } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 import SiteInchargeProjectsOverview from "@/components/dashboard/siteincharge/SiteInchargeProjectsOverview";
 import TaskVerificationList from "@/components/dashboard/siteincharge/TaskVerificationList";
@@ -108,6 +110,11 @@ const SiteInchargeDashboard = () => {
                     </div>
                     <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">Standard</span>
                   </div>
+                  <div className="flex justify-center mt-4">
+                    <Button variant="outline" size="sm" asChild>
+                      <Link to="/verifications">View All Verifications</Link>
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -119,6 +126,11 @@ const SiteInchargeDashboard = () => {
               </CardHeader>
               <CardContent>
                 <SiteInchargeQualityIssues />
+                <div className="flex justify-center mt-4">
+                  <Button variant="outline" size="sm" asChild>
+                    <Link to="/quality">View All Quality Issues</Link>
+                  </Button>
+                </div>
               </CardContent>
             </Card>
             <Card>
@@ -143,6 +155,11 @@ const SiteInchargeDashboard = () => {
                       <p className="text-xs">Apr 13, 2:00 PM</p>
                     </div>
                   </div>
+                  <div className="flex justify-center mt-4">
+                    <Button variant="outline" size="sm" asChild>
+                      <Link to="/inspections">View All Inspections</Link>
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -155,6 +172,11 @@ const SiteInchargeDashboard = () => {
             </CardHeader>
             <CardContent>
               <TaskVerificationList />
+              <div className="flex justify-center mt-4">
+                <Button variant="outline" size="sm" asChild>
+                  <Link to="/verifications">View All Verifications</Link>
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -164,7 +186,12 @@ const SiteInchargeDashboard = () => {
               <CardTitle>Quality Control</CardTitle>
             </CardHeader>
             <CardContent>
-              <p>Quality control interface will be implemented here.</p>
+              <SiteInchargeQualityIssues />
+              <div className="flex justify-center mt-4">
+                <Button variant="outline" size="sm" asChild>
+                  <Link to="/quality">Manage Quality Control</Link>
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -175,6 +202,11 @@ const SiteInchargeDashboard = () => {
             </CardHeader>
             <CardContent>
               <SiteInchargeSchedule />
+              <div className="flex justify-center mt-4">
+                <Button variant="outline" size="sm" asChild>
+                  <Link to="/schedule">View Full Schedule</Link>
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

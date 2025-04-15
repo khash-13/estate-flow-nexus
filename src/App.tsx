@@ -39,6 +39,13 @@ import ContractorLabor from "./pages/contractor/ContractorLabor";
 import ContractorInvoices from "./pages/contractor/ContractorInvoices";
 import ContractorPhotoEvidence from "./pages/contractor/ContractorPhotoEvidence";
 
+// Site Incharge specific pages
+import TaskVerifications from "./pages/siteincharge/TaskVerifications";
+import QualityControl from "./pages/siteincharge/QualityControl";
+import SiteInspections from "./pages/siteincharge/SiteInspections";
+import ContractorsList from "./pages/siteincharge/ContractorsList";
+import ConstructionProgress from "./pages/siteincharge/ConstructionProgress";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -80,6 +87,13 @@ const App = () => (
             <Route path="/labor" element={<ContractorLabor />} />
             <Route path="/invoices" element={<ContractorInvoices />} />
             <Route path="/evidence" element={<ContractorPhotoEvidence />} />
+            
+            {/* Site Incharge Routes */}
+            <Route path="/verifications" element={<TaskVerifications />} />
+            <Route path="/quality" element={<QualityControl />} />
+            <Route path="/inspections" element={<SiteInspections />} />
+            <Route path="/contractors" element={<ContractorsList />} />
+            <Route path="/progress" element={<ConstructionProgress />} />
             
             {/* Accountant Routes */}
             <Route path="/invoices" element={<Invoices />} />
