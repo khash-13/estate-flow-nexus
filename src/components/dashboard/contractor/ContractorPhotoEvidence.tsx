@@ -18,35 +18,15 @@ import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { CONSTRUCTION_PHASES } from "@/types/construction";
 import UploadEvidenceDialog from "./UploadEvidenceDialog";
 import { toast } from "sonner";
+import { PhotoEvidence, ProjectData, TaskData, defaultProjects, defaultTasks } from './evidence/types';
 
-interface PhotoEvidence {
-  id: string;
-  title: string;
-  project: string;
-  unit: string;
-  task: string;
-  date: string;
-  category: string;
-  status: 'completed' | 'in_progress' | 'pending_review';
-  images: { url: string; caption: string }[];
-}
+const statusColors: Record<string, string> = {
+  completed: 'bg-green-100 text-green-800',
+  in_progress: 'bg-amber-100 text-amber-800',
+  pending_review: 'bg-blue-100 text-blue-800'
+};
 
-interface ContractorPhotoEvidenceProps {
-  projectsData?: {
-    name: string;
-    units: string[];
-  }[];
-  tasksData?: {
-    id: string;
-    title: string;
-    project: string;
-    unit: string;
-    phase: string;
-  }[];
-  onPhotoClick?: (photo: PhotoEvidence) => void;
-}
-
-const photos: PhotoEvidence[] = [
+const defaultPhotoList: PhotoEvidence[] = [
   {
     id: "pe1",
     title: "Foundation Complete",
@@ -105,54 +85,15 @@ const photos: PhotoEvidence[] = [
   }
 ];
 
-const statusColors: Record<string, string> = {
-  completed: 'bg-green-100 text-green-800',
-  in_progress: 'bg-amber-100 text-amber-800',
-  pending_review: 'bg-blue-100 text-blue-800'
-};
-
-const defaultProjectsData = [
-  {
-    name: "Riverside Tower",
-    units: ["Block A", "Block B", "Block C", "Block D"]
-  },
-  {
-    name: "Valley Heights",
-    units: ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"]
-  },
-  {
-    name: "Green Villa",
-    units: ["Villa 1", "Villa 2", "Villa 3"]
-  }
-];
-
-const defaultTasksData = [
-  {
-    id: "task1",
-    title: "Foundation concrete pouring",
-    project: "Riverside Tower",
-    unit: "Block A",
-    phase: "groundwork_foundation"
-  },
-  {
-    id: "task2",
-    title: "Wall framing",
-    project: "Valley Heights",
-    unit: "Unit 3",
-    phase: "structural_framework"
-  },
-  {
-    id: "task3",
-    title: "Electrical installation",
-    project: "Green Villa",
-    unit: "Villa 2",
-    phase: "electrical_works"
-  }
-];
+interface ContractorPhotoEvidenceProps {
+  projectsData?: ProjectData[];
+  tasksData?: TaskData[];
+  onPhotoClick?: (photo: PhotoEvidence) => void;
+}
 
 const ContractorPhotoEvidence: React.FC<ContractorPhotoEvidenceProps> = ({ 
-  projectsData = defaultProjectsData,
-  tasksData = defaultTasksData,
+  projectsData = defaultProjects,
+  tasksData = defaultTasks,
   onPhotoClick
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -160,7 +101,7 @@ const ContractorPhotoEvidence: React.FC<ContractorPhotoEvidenceProps> = ({
   const [categoryFilter, setCategoryFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [photoList, setPhotoList] = useState<PhotoEvidence[]>(photos);
+  const [photoList, setPhotoList] = useState<PhotoEvidence[]>(defaultPhotoList);
   
   const filteredPhotos = photoList.filter(photo => {
     const matchesSearch = searchQuery === '' || 
@@ -191,6 +132,7 @@ const ContractorPhotoEvidence: React.FC<ContractorPhotoEvidenceProps> = ({
   
   return (
     <div className="space-y-6">
+      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -234,6 +176,7 @@ const ContractorPhotoEvidence: React.FC<ContractorPhotoEvidenceProps> = ({
         </Card>
       </div>
       
+      {/* Main Content */}
       <div>
         <Tabs defaultValue="all" onValueChange={setStatusFilter}>
           <TabsList className="mb-4">
@@ -302,6 +245,7 @@ const ContractorPhotoEvidence: React.FC<ContractorPhotoEvidenceProps> = ({
             </Dialog>
           </div>
           
+          {/* Photos Table */}
           <div className="border rounded-md">
             <Table>
               <TableHeader>
