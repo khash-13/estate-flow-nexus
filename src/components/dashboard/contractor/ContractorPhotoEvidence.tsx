@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
@@ -262,7 +263,7 @@ const ContractorPhotoEvidence: React.FC<ContractorPhotoEvidenceProps> = ({
                   </div>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Projects</SelectItem>
+                  <SelectItem value="all">All Projects</SelectItem>
                   {projects.map(project => (
                     <SelectItem key={project} value={project}>{project}</SelectItem>
                   ))}
@@ -277,7 +278,7 @@ const ContractorPhotoEvidence: React.FC<ContractorPhotoEvidenceProps> = ({
                   </div>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Categories</SelectItem>
+                  <SelectItem value="all">All Categories</SelectItem>
                   {Object.entries(CONSTRUCTION_PHASES).map(([key, phase]) => (
                     <SelectItem key={key} value={key}>{phase.title}</SelectItem>
                   ))}

@@ -315,7 +315,7 @@ const UploadEvidenceDialog = ({
               {tasks.find(t => t.id === selectedTask)?.title}
             </p>
             <p className="text-sm text-muted-foreground">
-              Phase: {selectedPhase && CONSTRUCTION_PHASES[selectedPhase]?.title}
+              Phase: {selectedPhase && CONSTRUCTION_PHASES[selectedPhase as keyof typeof CONSTRUCTION_PHASES]?.title}
             </p>
           </div>
         ) : (
