@@ -27,8 +27,23 @@ import { Search, Plus, BadgeIndianRupee, Users, CalendarClock } from "lucide-rea
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 
+// Define interface for labor team
+interface LaborTeam {
+  id: string;
+  name: string;
+  supervisor: string;
+  type: string;
+  members: number;
+  wage: number;
+  project: string;
+  attendance: number;
+  contact: string;
+  status: string;
+  remarks?: string;
+}
+
 // Sample labor team data
-const initialTeams = [
+const initialTeams: LaborTeam[] = [
   {
     id: "1",
     name: "Masonry Team A",
@@ -118,12 +133,12 @@ const attendanceData = [
 
 const ContractorLabor = () => {
   const { user } = useAuth();
-  const [teams, setTeams] = useState(initialTeams);
+  const [teams, setTeams] = useState<LaborTeam[]>(initialTeams);
   const [searchQuery, setSearchQuery] = useState("");
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [viewTeamDialogOpen, setViewTeamDialogOpen] = useState(false);
   const [attendanceDialogOpen, setAttendanceDialogOpen] = useState(false);
-  const [selectedTeam, setSelectedTeam] = useState<any>(null);
+  const [selectedTeam, setSelectedTeam] = useState<LaborTeam | null>(null);
 
   const form = useForm<LaborTeamFormValues>({
     resolver: zodResolver(laborTeamSchema),
@@ -143,12 +158,19 @@ const ContractorLabor = () => {
   ];
 
   const handleSubmit = (data: LaborTeamFormValues) => {
-    // Create new team entry
-    const newTeam = {
-      ...data,
+    // Create new team entry with all required fields
+    const newTeam: LaborTeam = {
       id: (teams.length + 1).toString(),
-      status: "Active" as const,
+      name: data.name,
+      supervisor: data.supervisor,
+      type: data.type,
+      members: data.members,
+      wage: data.wage,
+      project: data.project,
+      contact: data.contact,
+      status: "Active",
       attendance: 100, // Default attendance for new team
+      remarks: data.remarks
     };
     
     setTeams([...teams, newTeam]);
@@ -157,12 +179,12 @@ const ContractorLabor = () => {
     setAddDialogOpen(false);
   };
 
-  const viewTeam = (team: any) => {
+  const viewTeam = (team: LaborTeam) => {
     setSelectedTeam(team);
     setViewTeamDialogOpen(true);
   };
 
-  const viewAttendance = (team: any) => {
+  const viewAttendance = (team: LaborTeam) => {
     setSelectedTeam(team);
     setAttendanceDialogOpen(true);
   };

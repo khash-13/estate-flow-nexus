@@ -46,6 +46,7 @@ const sampleProperties: Property[] = [
     plotNo: "A-101",
     villaFacing: "North-East",
     extent: 1250,
+    propertyType: "Villa", // Added missing propertyType
     customerName: "John Smith",
     customerStatus: "Purchased",
     status: "Sold",
@@ -73,6 +74,7 @@ const sampleProperties: Property[] = [
     plotNo: "B-202",
     villaFacing: "South",
     extent: 1800,
+    propertyType: "Apartment", // Added missing propertyType
     customerName: "Emily Johnson",
     customerStatus: "Purchased",
     status: "Under Construction",
@@ -100,6 +102,7 @@ const sampleProperties: Property[] = [
     plotNo: "C-115",
     villaFacing: "West",
     extent: 950,
+    propertyType: "Apartment", // Added missing propertyType
     customerName: "",
     customerStatus: "Open",
     status: "Available",
@@ -127,6 +130,7 @@ const sampleProperties: Property[] = [
     plotNo: "D-405",
     villaFacing: "North-West",
     extent: 2200,
+    propertyType: "Villa", // Added missing propertyType
     customerName: "Michael Brown",
     customerStatus: "Blocked",
     status: "Reserved",
@@ -154,6 +158,7 @@ const sampleProperties: Property[] = [
     plotNo: "E-88",
     villaFacing: "South-East",
     extent: 3000,
+    propertyType: "Villa", // Added missing propertyType
     customerName: "Robert Davis",
     customerStatus: "Purchased",
     status: "Under Construction",
@@ -181,6 +186,7 @@ const sampleProperties: Property[] = [
     plotNo: "F-77",
     villaFacing: "North",
     extent: 1100,
+    propertyType: "Apartment", // Added missing propertyType
     customerName: "Kevin Martin",
     customerStatus: "Inquiry",
     status: "Available",
@@ -208,6 +214,7 @@ const sampleProperties: Property[] = [
     plotNo: "G-22",
     villaFacing: "East",
     extent: 5000,
+    propertyType: "Villa", // Added missing propertyType
     customerName: "Patricia Williams",
     customerStatus: "Purchased",
     status: "Sold",
@@ -235,6 +242,7 @@ const sampleProperties: Property[] = [
     plotNo: "H-56",
     villaFacing: "West",
     extent: 1050,
+    propertyType: "Apartment", // Added missing propertyType
     customerName: "Nancy Taylor",
     customerStatus: "Purchased",
     status: "Under Construction",
