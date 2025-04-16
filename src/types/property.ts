@@ -7,6 +7,8 @@ export type PropertyStatus = 'Available' | 'Sold' | 'Under Construction' | 'Rese
 
 export type RegistrationStatus = 'Completed' | 'In Progress' | 'Pending' | 'Not Started';
 
+export type PropertyType = 'Villa' | 'Apartment' | 'Plot' | 'Land Parcel';
+
 export interface Property {
   id: string;
   memNo: string;
@@ -14,6 +16,7 @@ export interface Property {
   plotNo: string;
   villaFacing: VillaFacing;
   extent: number;
+  propertyType: PropertyType;
   customerName: string;
   customerStatus: CustomerStatus;
   status: PropertyStatus;
@@ -33,4 +36,5 @@ export interface Property {
   municipalPermission: boolean;
   googleMapsLocation?: string;
   thumbnailUrl?: string;
+  images?: string[];
 }

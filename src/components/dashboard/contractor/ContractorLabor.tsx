@@ -1,390 +1,663 @@
-import React, { useState } from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
+
+import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-import { 
-  Search, Filter, Plus, MoreHorizontal, 
-  Users, UserCheck, Clock, Calendar, Hammer, Construction
-} from 'lucide-react';
-import { 
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, 
-  DropdownMenuLabel, DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { toast } from "sonner";
+import { Search, Plus, BadgeIndianRupee, Users, CalendarClock } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 
-interface LaborTeam {
-  id: string;
-  name: string;
-  type: string;
-  project: string;
-  unit: string;
-  size: number;
-  supervisor: string;
-  phone: string;
-  status: 'active' | 'scheduled' | 'offsite' | 'completed';
-  progress: number;
-  start_date: string;
-  end_date: string;
-  cost_per_day: number;
-}
-
-const laborTeams: LaborTeam[] = [
+// Sample labor team data
+const initialTeams = [
   {
-    id: "lt1",
-    name: "Team Alpha",
+    id: "1",
+    name: "Masonry Team A",
+    supervisor: "Rajesh Kumar",
     type: "Masonry",
-    project: "Riverside Tower",
-    unit: "Block A",
-    size: 12,
-    supervisor: "Ramesh Kumar",
-    phone: "+91 98765 43210",
-    status: "active",
-    progress: 68,
-    start_date: "2025-03-15",
-    end_date: "2025-04-30",
-    cost_per_day: 15000
+    members: 12,
+    wage: 850,
+    project: "Skyline Towers Construction",
+    attendance: 95,
+    contact: "9876543210",
+    status: "Active",
   },
   {
-    id: "lt2",
-    name: "Team Bravo",
-    type: "Electrical",
-    project: "Riverside Tower",
-    unit: "Block B",
-    size: 8,
+    id: "2",
+    name: "Electrical Crew",
     supervisor: "Suresh Patel",
-    phone: "+91 87654 32109",
-    status: "scheduled",
-    progress: 0,
-    start_date: "2025-04-25",
-    end_date: "2025-05-15",
-    cost_per_day: 12000
+    type: "Electrical",
+    members: 8,
+    wage: 950,
+    project: "Green Valley Villas Phase 1",
+    attendance: 88,
+    contact: "9876543211",
+    status: "Active",
   },
   {
-    id: "lt3",
-    name: "Team Charlie",
+    id: "3",
+    name: "Plumbing Team",
+    supervisor: "Mahesh Sharma",
     type: "Plumbing",
-    project: "Valley Heights",
-    unit: "Unit 3",
-    size: 6,
-    supervisor: "Dinesh Sharma",
-    phone: "+91 76543 21098",
-    status: "active",
-    progress: 42,
-    start_date: "2025-03-25",
-    end_date: "2025-04-20",
-    cost_per_day: 9000
+    members: 6,
+    wage: 900,
+    project: "Skyline Towers Construction",
+    attendance: 92,
+    contact: "9876543212",
+    status: "Active",
   },
   {
-    id: "lt4",
-    name: "Team Delta",
-    type: "Concrete",
-    project: "Green Villa",
-    unit: "Villa 2",
-    size: 15,
-    supervisor: "Mahesh Joshi",
-    phone: "+91 65432 10987",
-    status: "completed",
-    progress: 100,
-    start_date: "2025-02-10",
-    end_date: "2025-03-20",
-    cost_per_day: 18000
+    id: "4",
+    name: "Carpentry Crew",
+    supervisor: "Dinesh Singh",
+    type: "Carpentry",
+    members: 7,
+    wage: 925,
+    project: "Green Valley Villas Phase 1",
+    attendance: 85,
+    contact: "9876543213",
+    status: "Inactive",
   },
   {
-    id: "lt5",
-    name: "Team Echo",
-    type: "Finishing",
-    project: "Valley Heights",
-    unit: "Unit 4",
-    size: 10,
-    supervisor: "Rajesh Singh",
-    phone: "+91 54321 09876",
-    status: "offsite",
-    progress: 25,
-    start_date: "2025-03-10",
-    end_date: "2025-04-25",
-    cost_per_day: 13500
-  }
+    id: "5",
+    name: "Painting Team B",
+    supervisor: "Ramesh Verma",
+    type: "Painting",
+    members: 10,
+    wage: 800,
+    project: "Skyline Towers Construction",
+    attendance: 90,
+    contact: "9876543214",
+    status: "Active",
+  },
 ];
 
-const laborDistributionData = [
-  { name: "Masonry", value: 12 },
-  { name: "Electrical", value: 8 },
-  { name: "Plumbing", value: 6 },
-  { name: "Concrete", value: 15 },
-  { name: "Finishing", value: 10 }
+// Form schema
+const laborTeamSchema = z.object({
+  name: z.string().min(2, "Team name is required"),
+  supervisor: z.string().min(2, "Supervisor name is required"),
+  type: z.string().min(1, "Team type is required"),
+  members: z.coerce.number().int().positive("Number of members must be positive"),
+  wage: z.coerce.number().positive("Daily wage must be positive"),
+  project: z.string().min(2, "Project is required"),
+  contact: z.string().min(10, "Valid contact number is required").max(15),
+  remarks: z.string().optional(),
+});
+
+type LaborTeamFormValues = z.infer<typeof laborTeamSchema>;
+
+// Sample attendance data
+const attendanceData = [
+  { id: "1", date: "2023-06-01", present: 47, absent: 5 },
+  { id: "2", date: "2023-06-02", present: 49, absent: 3 },
+  { id: "3", date: "2023-06-03", present: 46, absent: 6 },
+  { id: "4", date: "2023-06-04", present: 50, absent: 2 },
+  { id: "5", date: "2023-06-05", present: 48, absent: 4 },
+  { id: "6", date: "2023-06-06", present: 45, absent: 7 },
+  { id: "7", date: "2023-06-07", present: 49, absent: 3 },
 ];
-
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
-
-const statusColors: Record<string, string> = {
-  active: 'bg-green-100 text-green-800',
-  scheduled: 'bg-blue-100 text-blue-800',
-  offsite: 'bg-amber-100 text-amber-800',
-  completed: 'bg-purple-100 text-purple-800'
-};
 
 const ContractorLabor = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [typeFilter, setTypeFilter] = useState('');
-  const [projectFilter, setProjectFilter] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  
-  const filteredTeams = laborTeams.filter(team => {
-    const matchesSearch = searchQuery === '' || 
-      team.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      team.supervisor.toLowerCase().includes(searchQuery.toLowerCase());
-      
-    const matchesType = typeFilter === '' || team.type === typeFilter;
-    const matchesProject = projectFilter === '' || team.project === projectFilter;
-    const matchesStatus = statusFilter === 'all' || team.status === statusFilter;
-    
-    return matchesSearch && matchesType && matchesProject && matchesStatus;
+  const { user } = useAuth();
+  const [teams, setTeams] = useState(initialTeams);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [viewTeamDialogOpen, setViewTeamDialogOpen] = useState(false);
+  const [attendanceDialogOpen, setAttendanceDialogOpen] = useState(false);
+  const [selectedTeam, setSelectedTeam] = useState<any>(null);
+
+  const form = useForm<LaborTeamFormValues>({
+    resolver: zodResolver(laborTeamSchema),
+    defaultValues: {
+      type: "Masonry",
+      members: 1,
+      wage: 800,
+      project: "Skyline Towers Construction",
+    },
   });
-  
-  const teamTypes = Array.from(new Set(laborTeams.map(t => t.type)));
-  const projects = Array.from(new Set(laborTeams.map(t => t.project)));
-  
-  const totalWorkforce = laborTeams.reduce((sum, team) => sum + team.size, 0);
-  const activeWorkforce = laborTeams
-    .filter(team => team.status === 'active')
-    .reduce((sum, team) => sum + team.size, 0);
+
+  // Sample project list
+  const projects = [
+    "Skyline Towers Construction",
+    "Green Valley Villas Phase 1",
+    "Riverside Apartments Foundation",
+  ];
+
+  const handleSubmit = (data: LaborTeamFormValues) => {
+    // Create new team entry
+    const newTeam = {
+      ...data,
+      id: (teams.length + 1).toString(),
+      status: "Active" as const,
+      attendance: 100, // Default attendance for new team
+    };
+    
+    setTeams([...teams, newTeam]);
+    toast.success("Labor team added successfully");
+    form.reset();
+    setAddDialogOpen(false);
+  };
+
+  const viewTeam = (team: any) => {
+    setSelectedTeam(team);
+    setViewTeamDialogOpen(true);
+  };
+
+  const viewAttendance = (team: any) => {
+    setSelectedTeam(team);
+    setAttendanceDialogOpen(true);
+  };
+
+  // Filter teams based on search
+  const filteredTeams = teams.filter((team) => {
+    return (
+      team.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      team.supervisor.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      team.project.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      team.type.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  });
+
+  // Calculate statistics
+  const totalTeams = teams.length;
+  const activeTeams = teams.filter(team => team.status === "Active").length;
+  const totalWorkers = teams.reduce((acc, team) => acc + team.members, 0);
+  const averageAttendance = teams.reduce((acc, team) => acc + team.attendance, 0) / teams.length;
   
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Workforce</CardTitle>
-            <Users className="h-4 w-4 text-slate-500" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Total Teams</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalWorkforce}</div>
-            <p className="text-xs text-muted-foreground">Across {laborTeams.length} teams</p>
+            <div className="flex items-center">
+              <Users className="h-4 w-4 text-muted-foreground mr-2" />
+              <div className="text-2xl font-bold">{totalTeams}</div>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {activeTeams} active, {totalTeams - activeTeams} inactive
+            </p>
           </CardContent>
         </Card>
         
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Workers</CardTitle>
-            <UserCheck className="h-4 w-4 text-green-500" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Total Workers</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{activeWorkforce}</div>
-            <p className="text-xs text-muted-foreground">{((activeWorkforce/totalWorkforce) * 100).toFixed(0)}% of total workforce</p>
+            <div className="text-2xl font-bold">{totalWorkers}</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Across {totalTeams} teams
+            </p>
           </CardContent>
         </Card>
         
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Daily Labor Cost</CardTitle>
-            <Clock className="h-4 w-4 text-amber-500" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Avg. Attendance</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">₹{laborTeams.reduce((sum, team) => sum + (team.status === 'active' ? team.cost_per_day : 0), 0).toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">Active teams only</p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Scheduled Teams</CardTitle>
-            <Calendar className="h-4 w-4 text-blue-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{laborTeams.filter(team => team.status === 'scheduled').length}</div>
-            <p className="text-xs text-muted-foreground">Starting this week</p>
+            <div className="text-2xl font-bold">{averageAttendance.toFixed(1)}%</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Last 7 days
+            </p>
           </CardContent>
         </Card>
       </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CardTitle>Team Allocation</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Tabs defaultValue="all" onValueChange={setStatusFilter}>
-              <TabsList className="mb-4">
-                <TabsTrigger value="all">All Teams</TabsTrigger>
-                <TabsTrigger value="active">Active</TabsTrigger>
-                <TabsTrigger value="scheduled">Scheduled</TabsTrigger>
-                <TabsTrigger value="offsite">Offsite</TabsTrigger>
-                <TabsTrigger value="completed">Completed</TabsTrigger>
-              </TabsList>
-              
-              <div className="flex items-center space-x-2 mb-4">
-                <div className="relative flex-1">
-                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search teams or supervisors..."
-                    className="pl-8"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                </div>
-                
-                <Select value={typeFilter} onValueChange={setTypeFilter}>
-                  <SelectTrigger className="w-[180px]">
+
+      <div className="flex flex-col sm:flex-row justify-between gap-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search teams, supervisors, projects..."
+            className="pl-8"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+        <Button onClick={() => setAddDialogOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" /> Add Labor Team
+        </Button>
+      </div>
+
+      <div className="border rounded-md overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Team Name</TableHead>
+              <TableHead>Supervisor</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead>Workers</TableHead>
+              <TableHead>Daily Wage (₹)</TableHead>
+              <TableHead>Project</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredTeams.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={8} className="h-24 text-center">
+                  No labor teams found.
+                </TableCell>
+              </TableRow>
+            ) : (
+              filteredTeams.map((team) => (
+                <TableRow key={team.id}>
+                  <TableCell className="font-medium">{team.name}</TableCell>
+                  <TableCell>{team.supervisor}</TableCell>
+                  <TableCell>{team.type}</TableCell>
+                  <TableCell>{team.members}</TableCell>
+                  <TableCell>
                     <div className="flex items-center">
-                      <Construction className="h-4 w-4 mr-2" />
-                      <span>{typeFilter || 'Team Type'}</span>
+                      <BadgeIndianRupee className="h-3.5 w-3.5 mr-1" />
+                      {team.wage}
                     </div>
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all-types">All Types</SelectItem>
-                    {teamTypes.map(type => (
-                      <SelectItem key={type} value={type}>{type}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                
-                <Select value={projectFilter} onValueChange={setProjectFilter}>
-                  <SelectTrigger className="w-[180px]">
-                    <div className="flex items-center">
-                      <Filter className="h-4 w-4 mr-2" />
-                      <span>{projectFilter || 'Project'}</span>
+                  </TableCell>
+                  <TableCell className="max-w-[150px] truncate" title={team.project}>
+                    {team.project}
+                  </TableCell>
+                  <TableCell>
+                    <span className={`px-2 py-1 rounded-full text-xs ${
+                      team.status === "Active" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
+                    }`}>
+                      {team.status}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex space-x-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => viewTeam(team)}
+                      >
+                        Details
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => viewAttendance(team)}
+                      >
+                        Attendance
+                      </Button>
                     </div>
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all-projects">All Projects</SelectItem>
-                    {projects.map(project => (
-                      <SelectItem key={project} value={project}>{project}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Team
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Add Labor Team Dialog */}
+      <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Add New Labor Team</DialogTitle>
+          </DialogHeader>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Team Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter team name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="supervisor"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Supervisor Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter supervisor name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Team Type</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select team type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Masonry">Masonry</SelectItem>
+                          <SelectItem value="Electrical">Electrical</SelectItem>
+                          <SelectItem value="Plumbing">Plumbing</SelectItem>
+                          <SelectItem value="Carpentry">Carpentry</SelectItem>
+                          <SelectItem value="Painting">Painting</SelectItem>
+                          <SelectItem value="Flooring">Flooring</SelectItem>
+                          <SelectItem value="Welding">Welding</SelectItem>
+                          <SelectItem value="General">General Labor</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="members"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Number of Workers</FormLabel>
+                      <FormControl>
+                        <Input type="number" min="1" placeholder="10" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="wage"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Daily Wage (₹)</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <BadgeIndianRupee className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                          <Input className="pl-10" type="number" placeholder="800" {...field} />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="project"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Project</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select project" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {projects.map((project) => (
+                            <SelectItem key={project} value={project}>
+                              {project}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="contact"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Contact Number</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter contact number" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="remarks"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Remarks</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Any additional information"
+                        {...field}
+                        value={field.value || ''}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="flex justify-end space-x-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setAddDialogOpen(false)}
+                >
+                  Cancel
                 </Button>
+                <Button type="submit">Add Team</Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* View Team Dialog */}
+      {selectedTeam && (
+        <Dialog open={viewTeamDialogOpen} onOpenChange={setViewTeamDialogOpen}>
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle>Team Details</DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground">Team Name</h4>
+                  <p className="text-base font-medium">{selectedTeam.name}</p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground">Supervisor</h4>
+                  <p className="text-base">{selectedTeam.supervisor}</p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground">Team Type</h4>
+                  <p className="text-base">{selectedTeam.type}</p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground">Number of Workers</h4>
+                  <p className="text-base">{selectedTeam.members}</p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground">Daily Wage</h4>
+                  <p className="text-base flex items-center">
+                    <BadgeIndianRupee className="h-3.5 w-3.5 mr-1" />
+                    {selectedTeam.wage} per worker
+                  </p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground">Daily Cost</h4>
+                  <p className="text-base flex items-center">
+                    <BadgeIndianRupee className="h-3.5 w-3.5 mr-1" />
+                    {(selectedTeam.wage * selectedTeam.members).toLocaleString()} total
+                  </p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground">Project</h4>
+                  <p className="text-base">{selectedTeam.project}</p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground">Contact Number</h4>
+                  <p className="text-base">{selectedTeam.contact}</p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground">Average Attendance</h4>
+                  <p className="text-base">{selectedTeam.attendance}%</p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground">Status</h4>
+                  <p className={`inline-block px-2 py-1 rounded-full text-xs ${
+                    selectedTeam.status === "Active" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
+                  }`}>
+                    {selectedTeam.status}
+                  </p>
+                </div>
               </div>
               
-              <div className="border rounded-md">
+              <div className="flex justify-between pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setViewTeamDialogOpen(false);
+                    setAttendanceDialogOpen(true);
+                  }}
+                >
+                  <CalendarClock className="mr-2 h-4 w-4" />
+                  View Attendance
+                </Button>
+                <Button
+                  type="button"
+                  onClick={() => setViewTeamDialogOpen(false)}
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Attendance Dialog */}
+      {selectedTeam && (
+        <Dialog open={attendanceDialogOpen} onOpenChange={setAttendanceDialogOpen}>
+          <DialogContent className="sm:max-w-[700px]">
+            <DialogHeader>
+              <DialogTitle>Attendance Record - {selectedTeam.name}</DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              <div className="flex justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Supervisor: {selectedTeam.supervisor}</p>
+                  <p className="text-sm text-muted-foreground">Total Workers: {selectedTeam.members}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Average Attendance: {selectedTeam.attendance}%</p>
+                </div>
+              </div>
+              
+              <div className="border rounded-md overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Team</TableHead>
-                      <TableHead>Project / Unit</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Progress</TableHead>
-                      <TableHead>Timeline</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Present</TableHead>
+                      <TableHead>Absent</TableHead>
+                      <TableHead>Percentage</TableHead>
+                      <TableHead>Daily Cost (₹)</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredTeams.map((team) => (
-                      <TableRow key={team.id}>
-                        <TableCell>
-                          <div>
-                            <div className="font-medium">{team.name}</div>
-                            <div className="text-xs text-muted-foreground flex items-center">
-                              <Hammer className="h-3 w-3 mr-1" />
-                              {team.type}
+                    {attendanceData.map((record) => {
+                      const percentage = Math.round((record.present / (record.present + record.absent)) * 100);
+                      const dailyCost = record.present * selectedTeam.wage;
+                      
+                      return (
+                        <TableRow key={record.id}>
+                          <TableCell>{record.date}</TableCell>
+                          <TableCell>{record.present}</TableCell>
+                          <TableCell>{record.absent}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center">
+                              <div className="w-16 h-2 bg-gray-200 rounded-full mr-2">
+                                <div 
+                                  className="h-2 bg-green-500 rounded-full" 
+                                  style={{width: `${percentage}%`}}
+                                />
+                              </div>
+                              {percentage}%
                             </div>
-                            <div className="text-xs text-muted-foreground mt-1">
-                              <span className="font-medium">Supervisor:</span> {team.supervisor}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center">
+                              <BadgeIndianRupee className="h-3.5 w-3.5 mr-1" />
+                              {dailyCost.toLocaleString()}
                             </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div>
-                            <div>{team.project}</div>
-                            <div className="text-xs text-muted-foreground">{team.unit}</div>
-                          </div>
-                          <div className="text-xs font-medium mt-1">
-                            Workers: {team.size}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline" className={statusColors[team.status]}>
-                            {team.status.charAt(0).toUpperCase() + team.status.slice(1)}
-                          </Badge>
-                          <div className="text-xs text-muted-foreground mt-1">
-                            ₹{team.cost_per_day.toLocaleString()}/day
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="space-y-1">
-                            <div className="text-xs flex justify-between">
-                              <span>Progress</span>
-                              <span>{team.progress}%</span>
-                            </div>
-                            <Progress value={team.progress} className="h-2" />
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="text-xs">
-                            <div>
-                              <span className="text-muted-foreground">Start:</span>{" "}
-                              {new Date(team.start_date).toLocaleDateString()}
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">End:</span>{" "}
-                              {new Date(team.end_date).toLocaleDateString()}
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" className="h-8 w-8 p-0">
-                                <span className="sr-only">Open menu</span>
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                              <DropdownMenuItem>View Details</DropdownMenuItem>
-                              <DropdownMenuItem>Update Status</DropdownMenuItem>
-                              <DropdownMenuItem>Attendance Record</DropdownMenuItem>
-                              <DropdownMenuItem>Payment History</DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                   </TableBody>
                 </Table>
               </div>
-            </Tabs>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle>Workforce Distribution</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={laborDistributionData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                  >
-                    {laborDistributionData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(value) => `${value} workers`} />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
+              
+              <div className="space-y-4 pt-2">
+                <h3 className="text-base font-medium">Record Attendance for Today</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="attendance-date">Date</Label>
+                    <Input id="attendance-date" type="date" defaultValue={new Date().toISOString().split('T')[0]} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="attendance-present">Present</Label>
+                    <Input id="attendance-present" type="number" defaultValue={selectedTeam.members} min="0" max={selectedTeam.members} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="attendance-absent">Absent</Label>
+                    <Input id="attendance-absent" type="number" defaultValue="0" min="0" max={selectedTeam.members} />
+                  </div>
+                </div>
+                <div className="flex justify-end space-x-2">
+                  <Button onClick={() => {
+                    toast.success("Attendance recorded successfully");
+                    setAttendanceDialogOpen(false);
+                  }}>
+                    Save Attendance
+                  </Button>
+                </div>
+              </div>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };

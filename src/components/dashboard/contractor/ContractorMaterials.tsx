@@ -1,349 +1,635 @@
-import React, { useState } from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
+
+import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Progress } from "@/components/ui/progress";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { 
-  Search, Filter, Plus, MoreHorizontal, ArrowUpDown, Construction, Package, 
-  Truck, AlertTriangle, CheckCircle
-} from 'lucide-react';
-import { 
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, 
-  DropdownMenuLabel, DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { toast } from "sonner";
+import { Search, Plus, BadgeIndianRupee, FileText, X } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-interface Material {
-  id: string;
-  name: string;
-  category: string;
-  project: string;
-  unit: string;
-  quantity: number;
-  unit_type: string;
-  status: 'in_stock' | 'ordered' | 'delayed' | 'low_stock';
-  required: number;
-  used: number;
-  cost_per_unit: number;
-  supplier: string;
-  delivery_date?: string;
-}
-
-const materials: Material[] = [
+// Sample material data
+const initialMaterials = [
   {
-    id: "m1",
-    name: "Cement OPC 53 Grade",
-    category: "Concrete Materials",
-    project: "Riverside Tower",
-    unit: "Block A",
-    quantity: 350,
-    unit_type: "bags",
-    status: "in_stock",
-    required: 800,
-    used: 450,
-    cost_per_unit: 350,
-    supplier: "BuildMart Materials"
+    id: "1",
+    name: "Cement",
+    type: "Construction",
+    quantity: 500,
+    unit: "Bags",
+    supplier: "Ultratech Cement",
+    rate: 350,
+    totalCost: 175000,
+    deliveryDate: "2023-06-15",
+    project: "Skyline Towers Construction",
+    status: "Delivered",
+    poNumber: "PO-2023-001",
+    invoiceNumber: "INV-2023-001",
   },
   {
-    id: "m2", 
-    name: "Steel Reinforcement 16mm",
-    category: "Structural Materials",
-    project: "Riverside Tower",
-    unit: "Block A",
-    quantity: 2.5,
-    unit_type: "tons",
-    status: "low_stock",
-    required: 10,
-    used: 7.5,
-    cost_per_unit: 62500,
-    supplier: "SteelX Industries"
-  },
-  {
-    id: "m3",
-    name: "Sand",
-    category: "Concrete Materials",
-    project: "Riverside Tower",
-    unit: "Block B",
+    id: "2",
+    name: "Steel Reinforcement",
+    type: "Construction",
     quantity: 20,
-    unit_type: "cubic meters",
-    status: "in_stock",
-    required: 50,
-    used: 30,
-    cost_per_unit: 1800,
-    supplier: "GeoSupplies Ltd"
+    unit: "Tonnes",
+    supplier: "JSW Steel",
+    rate: 62000,
+    totalCost: 1240000,
+    deliveryDate: "2023-06-18",
+    project: "Skyline Towers Construction",
+    status: "Delivered",
+    poNumber: "PO-2023-002",
+    invoiceNumber: "INV-2023-002",
   },
   {
-    id: "m4",
-    name: "Bricks",
-    category: "Masonry Materials",
-    project: "Valley Heights",
-    unit: "Unit 3",
-    quantity: 8000,
-    unit_type: "pieces",
-    status: "ordered",
-    required: 25000,
-    used: 17000,
-    cost_per_unit: 8,
-    supplier: "Red Clay Brick Co",
-    delivery_date: "2025-04-20"
+    id: "3",
+    name: "Sand",
+    type: "Construction",
+    quantity: 30,
+    unit: "Trucks",
+    supplier: "Local Quarry",
+    rate: 5000,
+    totalCost: 150000,
+    deliveryDate: "2023-06-20",
+    project: "Green Valley Villas Phase 1",
+    status: "Delivered",
+    poNumber: "PO-2023-003",
+    invoiceNumber: "INV-2023-003",
   },
   {
-    id: "m5",
-    name: "Ceramic Floor Tiles",
-    category: "Finishing Materials",
-    project: "Green Villa",
-    unit: "Villa 2",
-    quantity: 120,
-    unit_type: "boxes",
-    status: "delayed",
-    required: 120,
-    used: 0,
-    cost_per_unit: 1200,
-    supplier: "Elite Ceramics",
-    delivery_date: "2025-04-25"
-  }
+    id: "4",
+    name: "Tiles",
+    type: "Finishing",
+    quantity: 1500,
+    unit: "Sq. ft.",
+    supplier: "Kajaria Ceramics",
+    rate: 85,
+    totalCost: 127500,
+    deliveryDate: "2023-07-10",
+    project: "Green Valley Villas Phase 1",
+    status: "Ordered",
+    poNumber: "PO-2023-004",
+    invoiceNumber: "",
+  },
+  {
+    id: "5",
+    name: "Paint",
+    type: "Finishing",
+    quantity: 200,
+    unit: "Gallons",
+    supplier: "Asian Paints",
+    rate: 550,
+    totalCost: 110000,
+    deliveryDate: "2023-08-05",
+    project: "Green Valley Villas Phase 1",
+    status: "Pending",
+    poNumber: "PO-2023-005",
+    invoiceNumber: "",
+  },
 ];
 
-const materialUsageData = [
-  { name: 'Cement', ordered: 800, used: 450, remaining: 350 },
-  { name: 'Steel', ordered: 10, used: 7.5, remaining: 2.5 },
-  { name: 'Sand', ordered: 50, used: 30, remaining: 20 },
-  { name: 'Bricks', ordered: 25000, used: 17000, remaining: 8000 },
-  { name: 'Tiles', ordered: 120, used: 0, remaining: 120 },
-];
+// Form schema
+const materialSchema = z.object({
+  name: z.string().min(2, "Material name is required"),
+  type: z.string().min(1, "Type is required"),
+  quantity: z.coerce.number().positive("Quantity must be positive"),
+  unit: z.string().min(1, "Unit is required"),
+  supplier: z.string().min(2, "Supplier name is required"),
+  rate: z.coerce.number().positive("Rate must be positive"),
+  project: z.string().min(2, "Project is required"),
+  deliveryDate: z.string().optional(),
+  poNumber: z.string().optional(),
+  invoiceNumber: z.string().optional(),
+  remarks: z.string().optional(),
+});
 
-const statusColors: Record<string, string> = {
-  in_stock: 'bg-green-100 text-green-800',
-  ordered: 'bg-blue-100 text-blue-800',
-  delayed: 'bg-red-100 text-red-800',
-  low_stock: 'bg-amber-100 text-amber-800'
-};
+type MaterialFormValues = z.infer<typeof materialSchema>;
 
 const ContractorMaterials = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('');
-  const [projectFilter, setProjectFilter] = useState('');
-  
-  const filteredMaterials = materials.filter(material => {
-    const matchesSearch = searchQuery === '' || 
-      material.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      material.supplier.toLowerCase().includes(searchQuery.toLowerCase());
-      
-    const matchesCategory = categoryFilter === '' || material.category === categoryFilter;
-    const matchesProject = projectFilter === '' || material.project === projectFilter;
-    
-    return matchesSearch && matchesCategory && matchesProject;
+  const { user } = useAuth();
+  const [materials, setMaterials] = useState(initialMaterials);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
+  const [selectedMaterial, setSelectedMaterial] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState("all");
+
+  const form = useForm<MaterialFormValues>({
+    resolver: zodResolver(materialSchema),
+    defaultValues: {
+      type: "Construction",
+      unit: "Units",
+      project: "Skyline Towers Construction",
+    },
   });
-  
-  const categories = Array.from(new Set(materials.map(m => m.category)));
-  const projects = Array.from(new Set(materials.map(m => m.project)));
+
+  // Sample project list
+  const projects = [
+    "Skyline Towers Construction",
+    "Green Valley Villas Phase 1",
+    "Riverside Apartments Foundation",
+  ];
+
+  const handleSubmit = (data: MaterialFormValues) => {
+    // Calculate total cost
+    const totalCost = data.quantity * data.rate;
+    
+    // Create new material entry
+    const newMaterial = {
+      ...data,
+      id: (materials.length + 1).toString(),
+      totalCost,
+      status: "Pending" as const,
+    };
+    
+    setMaterials([...materials, newMaterial]);
+    toast.success("Material added successfully");
+    form.reset();
+    setAddDialogOpen(false);
+  };
+
+  const viewMaterial = (material: any) => {
+    setSelectedMaterial(material);
+    setViewDialogOpen(true);
+  };
+
+  // Filter materials based on search and active tab
+  const filteredMaterials = materials.filter((material) => {
+    const matchesSearch =
+      material.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      material.supplier.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      material.project.toLowerCase().includes(searchQuery.toLowerCase());
+      
+    if (activeTab === "all") return matchesSearch;
+    if (activeTab === "delivered") return matchesSearch && material.status === "Delivered";
+    if (activeTab === "pending") return matchesSearch && material.status === "Pending";
+    if (activeTab === "ordered") return matchesSearch && material.status === "Ordered";
+    
+    return matchesSearch;
+  });
+
+  // Calculate total cost of materials
+  const totalMaterialCost = materials.reduce((total, material) => total + material.totalCost, 0);
   
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Materials</CardTitle>
-            <Construction className="h-4 w-4 text-slate-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">5</div>
-            <p className="text-xs text-muted-foreground">Across 3 projects</p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Material Value</CardTitle>
-            <Package className="h-4 w-4 text-indigo-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">₹436,500</div>
-            <p className="text-xs text-muted-foreground">Total inventory value</p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Deliveries</CardTitle>
-            <Truck className="h-4 w-4 text-amber-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">2</div>
-            <p className="text-xs text-muted-foreground">Expected this week</p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Critical Materials</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-red-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">1</div>
-            <p className="text-xs text-muted-foreground">Requiring attention</p>
-          </CardContent>
-        </Card>
-      </div>
-      
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Materials Usage Overview</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={materialUsageData}
-                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="ordered" stackId="a" fill="#8884d8" name="Ordered" />
-                <Bar dataKey="used" stackId="a" fill="#82ca9d" name="Used" />
-                <Bar dataKey="remaining" stackId="a" fill="#ffc658" name="Remaining" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <div className="flex flex-col md:flex-row justify-between mb-4 gap-4">
-        <div className="flex flex-1 items-center space-x-2">
-          <div className="relative w-full md:w-64">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search materials..."
-              className="pl-8"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          
-          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className="w-fit">
-              <div className="flex items-center">
-                <Filter className="h-4 w-4 mr-2" />
-                <span>{categoryFilter || 'Category'}</span>
-              </div>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all-categories">All Categories</SelectItem>
-              {categories.map(category => (
-                <SelectItem key={category} value={category}>{category}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          
-          <Select value={projectFilter} onValueChange={setProjectFilter}>
-            <SelectTrigger className="w-fit">
-              <div className="flex items-center">
-                <Filter className="h-4 w-4 mr-2" />
-                <span>{projectFilter || 'Project'}</span>
-              </div>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all-projects">All Projects</SelectItem>
-              {projects.map(project => (
-                <SelectItem key={project} value={project}>{project}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+      <div className="flex flex-col sm:flex-row justify-between gap-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search materials, suppliers, projects..."
+            className="pl-8"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </div>
-        
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Material
+        <Button onClick={() => setAddDialogOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" /> Add Material
         </Button>
       </div>
-      
+
+      <div className="flex items-center justify-between">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid grid-cols-4 w-[400px]">
+            <TabsTrigger value="all">All</TabsTrigger>
+            <TabsTrigger value="delivered">Delivered</TabsTrigger>
+            <TabsTrigger value="ordered">Ordered</TabsTrigger>
+            <TabsTrigger value="pending">Pending</TabsTrigger>
+          </TabsList>
+        </Tabs>
+        
+        <div className="flex items-center gap-2 text-sm">
+          <span className="text-muted-foreground">Total Cost:</span>
+          <span className="font-semibold flex items-center">
+            <BadgeIndianRupee className="h-3.5 w-3.5" />
+            {totalMaterialCost.toLocaleString()}
+          </span>
+        </div>
+      </div>
+
       <div className="border rounded-md">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>
-                <div className="flex items-center">
-                  Material
-                  <ArrowUpDown className="ml-2 h-4 w-4" />
-                </div>
-              </TableHead>
-              <TableHead>Project / Unit</TableHead>
-              <TableHead>Quantity</TableHead>
-              <TableHead>Usage</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead>Material</TableHead>
               <TableHead>Supplier</TableHead>
+              <TableHead>Quantity</TableHead>
+              <TableHead>Rate (₹)</TableHead>
+              <TableHead>Total (₹)</TableHead>
+              <TableHead>Project</TableHead>
+              <TableHead>Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredMaterials.map((material) => (
-              <TableRow key={material.id}>
-                <TableCell className="font-medium">
-                  <div>
-                    {material.name}
-                    <div className="text-xs text-muted-foreground">{material.category}</div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  {material.project}
-                  <div className="text-xs text-muted-foreground">{material.unit}</div>
-                </TableCell>
-                <TableCell>
-                  {material.quantity} {material.unit_type}
-                  <div className="text-xs text-muted-foreground">
-                    ₹{(material.cost_per_unit * material.quantity).toLocaleString()}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="space-y-1">
-                    <div className="text-xs">
-                      {material.used} / {material.required} {material.unit_type}
-                    </div>
-                    <Progress value={(material.used / material.required) * 100} className="h-2" />
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Badge variant="outline" className={statusColors[material.status]}>
-                    {material.status === 'in_stock' && <CheckCircle className="h-3 w-3 mr-1" />}
-                    {material.status === 'ordered' && <Truck className="h-3 w-3 mr-1" />}
-                    {material.status === 'delayed' && <AlertTriangle className="h-3 w-3 mr-1" />}
-                    {material.status === 'low_stock' && <AlertTriangle className="h-3 w-3 mr-1" />}
-                    {material.status.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
-                  </Badge>
-                  {material.delivery_date && (
-                    <div className="text-xs text-muted-foreground mt-1">
-                      Delivery: {new Date(material.delivery_date).toLocaleDateString()}
-                    </div>
-                  )}
-                </TableCell>
-                <TableCell>{material.supplier}</TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">Open menu</span>
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuItem>View Details</DropdownMenuItem>
-                      <DropdownMenuItem>Update Stock</DropdownMenuItem>
-                      <DropdownMenuItem>Request Order</DropdownMenuItem>
-                      <DropdownMenuItem>Track Delivery</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+            {filteredMaterials.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={8} className="h-24 text-center">
+                  No materials found.
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              filteredMaterials.map((material) => (
+                <TableRow key={material.id}>
+                  <TableCell className="font-medium">{material.name}</TableCell>
+                  <TableCell>{material.supplier}</TableCell>
+                  <TableCell>
+                    {material.quantity} {material.unit}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center">
+                      <BadgeIndianRupee className="h-3.5 w-3.5 mr-1" />
+                      {material.rate.toLocaleString()}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center">
+                      <BadgeIndianRupee className="h-3.5 w-3.5 mr-1" />
+                      {material.totalCost.toLocaleString()}
+                    </div>
+                  </TableCell>
+                  <TableCell className="max-w-[150px] truncate" title={material.project}>
+                    {material.project}
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={
+                        material.status === "Delivered"
+                          ? "default"
+                          : material.status === "Ordered"
+                          ? "secondary"
+                          : "outline"
+                      }
+                    >
+                      {material.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => viewMaterial(material)}
+                    >
+                      View
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>
+
+      {/* Add Material Dialog */}
+      <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Add New Material</DialogTitle>
+          </DialogHeader>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Material Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter material name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Material Type</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select material type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Construction">Construction</SelectItem>
+                          <SelectItem value="Finishing">Finishing</SelectItem>
+                          <SelectItem value="Electrical">Electrical</SelectItem>
+                          <SelectItem value="Plumbing">Plumbing</SelectItem>
+                          <SelectItem value="Flooring">Flooring</SelectItem>
+                          <SelectItem value="Hardware">Hardware</SelectItem>
+                          <SelectItem value="Other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="quantity"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Quantity</FormLabel>
+                      <FormControl>
+                        <Input type="number" placeholder="Enter quantity" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="unit"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Unit</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select unit" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Units">Units</SelectItem>
+                          <SelectItem value="Bags">Bags</SelectItem>
+                          <SelectItem value="Tonnes">Tonnes</SelectItem>
+                          <SelectItem value="Kg">Kg</SelectItem>
+                          <SelectItem value="Meters">Meters</SelectItem>
+                          <SelectItem value="Sq. ft.">Sq. ft.</SelectItem>
+                          <SelectItem value="Cu. ft.">Cu. ft.</SelectItem>
+                          <SelectItem value="Gallons">Gallons</SelectItem>
+                          <SelectItem value="Liters">Liters</SelectItem>
+                          <SelectItem value="Trucks">Trucks</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="rate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Rate (₹ per unit)</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <BadgeIndianRupee className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                          <Input className="pl-10" type="number" placeholder="0" {...field} />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="supplier"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Supplier</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter supplier name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="project"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Project</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select project" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {projects.map((project) => (
+                            <SelectItem key={project} value={project}>
+                              {project}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="deliveryDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Expected Delivery Date</FormLabel>
+                      <FormControl>
+                        <Input type="date" {...field} value={field.value || ''} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="poNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Purchase Order Number</FormLabel>
+                      <FormControl>
+                        <Input placeholder="E.g., PO-2023-001" {...field} value={field.value || ''} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="invoiceNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Invoice Number</FormLabel>
+                      <FormControl>
+                        <Input placeholder="E.g., INV-2023-001" {...field} value={field.value || ''} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="remarks"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Remarks</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Enter any additional information"
+                        className="resize-none"
+                        {...field}
+                        value={field.value || ''}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="flex justify-end space-x-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setAddDialogOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit">Add Material</Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* View Material Dialog */}
+      {selectedMaterial && (
+        <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle className="flex justify-between">
+                <span>Material Details</span>
+                <Badge
+                  variant={
+                    selectedMaterial.status === "Delivered"
+                      ? "default"
+                      : selectedMaterial.status === "Ordered"
+                      ? "secondary"
+                      : "outline"
+                  }
+                >
+                  {selectedMaterial.status}
+                </Badge>
+              </DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground">Material Name</h4>
+                  <p className="text-base">{selectedMaterial.name}</p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground">Type</h4>
+                  <p className="text-base">{selectedMaterial.type}</p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground">Quantity</h4>
+                  <p className="text-base">
+                    {selectedMaterial.quantity} {selectedMaterial.unit}
+                  </p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground">Rate</h4>
+                  <p className="text-base flex items-center">
+                    <BadgeIndianRupee className="h-3.5 w-3.5 mr-1" />
+                    {selectedMaterial.rate.toLocaleString()} per {selectedMaterial.unit}
+                  </p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground">Total Cost</h4>
+                  <p className="text-lg font-semibold flex items-center">
+                    <BadgeIndianRupee className="h-4 w-4 mr-1" />
+                    {selectedMaterial.totalCost.toLocaleString()}
+                  </p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground">Supplier</h4>
+                  <p className="text-base">{selectedMaterial.supplier}</p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground">Project</h4>
+                  <p className="text-base">{selectedMaterial.project}</p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground">Delivery Date</h4>
+                  <p className="text-base">{selectedMaterial.deliveryDate || "Not specified"}</p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground">PO Number</h4>
+                  <p className="text-base flex items-center">
+                    {selectedMaterial.poNumber ? (
+                      <>
+                        <FileText className="h-4 w-4 mr-1" />
+                        {selectedMaterial.poNumber}
+                      </>
+                    ) : (
+                      "Not generated"
+                    )}
+                  </p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground">Invoice Number</h4>
+                  <p className="text-base flex items-center">
+                    {selectedMaterial.invoiceNumber ? (
+                      <>
+                        <FileText className="h-4 w-4 mr-1" />
+                        {selectedMaterial.invoiceNumber}
+                      </>
+                    ) : (
+                      "Not available"
+                    )}
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex justify-end pt-4">
+                <Button
+                  type="button"
+                  onClick={() => setViewDialogOpen(false)}
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };

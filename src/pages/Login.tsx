@@ -1,11 +1,13 @@
+
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate } from "react-router-dom";
-import { Building, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+
 const Login = () => {
   const {
     login,
@@ -36,9 +38,13 @@ const Login = () => {
         <Card className="w-full">
           <CardHeader className="space-y-1 text-center">
             <div className="flex justify-center mb-6">
-              <Building className="h-12 w-12 text-estate-navy" />
+              <img 
+                src="/public/lovable-uploads/30bdcab9-a5eb-4aa4-93cf-b6c08a16ec9b.png" 
+                alt="CSK Realtors Logo" 
+                className="h-24 w-auto"
+              />
             </div>
-            <CardTitle className="text-2xl font-bold">CSK REAL ESTATE</CardTitle>
+            <CardTitle className="text-2xl font-bold">CSK REALTORS LTD</CardTitle>
             <CardDescription>
               Enter your credentials to access your account
             </CardDescription>
