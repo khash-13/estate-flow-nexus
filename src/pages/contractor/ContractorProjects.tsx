@@ -32,6 +32,22 @@ const projectSchema = z.object({
 
 type ProjectFormValues = z.infer<typeof projectSchema>;
 
+// Define the project type explicitly
+interface Project {
+  id: string;
+  name: string;
+  location: string;
+  clientName: string;
+  projectType: string;
+  startDate: string;
+  estimatedEndDate: string;
+  estimatedBudget: number;
+  description: string;
+  status: string;
+  completion: number;
+  teamSize: number;
+}
+
 // Sample project data
 const sampleProjects = [
   {
@@ -80,7 +96,7 @@ const sampleProjects = [
 
 const ContractorProjects = () => {
   const { user } = useAuth();
-  const [projects, setProjects] = useState(sampleProjects);
+  const [projects, setProjects] = useState<Project[]>(sampleProjects);
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const form = useForm<ProjectFormValues>({
@@ -92,12 +108,20 @@ const ContractorProjects = () => {
   });
 
   const onSubmit = (data: ProjectFormValues) => {
-    // Add the new project to the list
-    const newProject = {
-      ...data,
+    // Create a new project with all required fields
+    const newProject: Project = {
       id: (projects.length + 1).toString(),
+      name: data.name,
+      location: data.location,
+      clientName: data.clientName,
+      projectType: data.projectType,
+      startDate: data.startDate,
+      estimatedEndDate: data.estimatedEndDate,
+      estimatedBudget: data.estimatedBudget,
+      description: data.description || "", // Provide default empty string for optional field
       status: "New",
-      completion: 0
+      completion: 0,
+      teamSize: data.teamSize
     };
 
     setProjects([...projects, newProject]);
