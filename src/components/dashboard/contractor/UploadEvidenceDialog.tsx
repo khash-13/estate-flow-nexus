@@ -12,21 +12,46 @@ import { toast } from "sonner";
 import { Camera, Upload, XCircle, FileImage } from "lucide-react";
 import { CONSTRUCTION_PHASES, ConstructionPhase } from "@/types/construction";
 
-interface UploadEvidenceDialogProps {
-  onOpenChange: (open: boolean) => void;
-  projects: {
-    name: string;
-    units: string[];
-  }[];
-  tasks: {
-    id: string;
-    title: string;
-    project: string;
-    unit: string;
-    phase: string;
-  }[];
-  onSubmit: (evidence: any) => void;
-}
+// Sample projects data - default fallback
+const defaultProjects = [
+  {
+    name: "Riverside Tower",
+    units: ["Block A", "Block B", "Block C", "Block D"]
+  },
+  {
+    name: "Valley Heights",
+    units: ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"]
+  },
+  {
+    name: "Green Villa",
+    units: ["Villa 1", "Villa 2", "Villa 3"]
+  }
+];
+
+// Sample tasks - default fallback
+const defaultTasks = [
+  {
+    id: "task1",
+    title: "Foundation concrete pouring",
+    project: "Riverside Tower",
+    unit: "Block A",
+    phase: "groundwork_foundation"
+  },
+  {
+    id: "task2",
+    title: "Wall framing",
+    project: "Valley Heights",
+    unit: "Unit 3",
+    phase: "structural_framework"
+  },
+  {
+    id: "task3",
+    title: "Electrical installation",
+    project: "Green Villa",
+    unit: "Villa 2",
+    phase: "electrical_works"
+  }
+];
 
 interface PhotoEvidence {
   id: string;
@@ -40,7 +65,28 @@ interface PhotoEvidence {
   images: { url: string; caption: string }[];
 }
 
-const UploadEvidenceDialog = ({ onOpenChange, projects, tasks, onSubmit }: UploadEvidenceDialogProps) => {
+interface UploadEvidenceDialogProps {
+  onOpenChange: (open: boolean) => void;
+  projects?: {
+    name: string;
+    units: string[];
+  }[];
+  tasks?: {
+    id: string;
+    title: string;
+    project: string;
+    unit: string;
+    phase: string;
+  }[];
+  onSubmit?: (evidence: PhotoEvidence) => void;
+}
+
+const UploadEvidenceDialog = ({ 
+  onOpenChange, 
+  projects = defaultProjects, 
+  tasks = defaultTasks, 
+  onSubmit = () => {} 
+}: UploadEvidenceDialogProps) => {
   const [title, setTitle] = useState("");
   const [selectedProject, setSelectedProject] = useState("");
   const [selectedUnit, setSelectedUnit] = useState("");
@@ -193,6 +239,9 @@ const UploadEvidenceDialog = ({ onOpenChange, projects, tasks, onSubmit }: Uploa
     setStatus("in_progress");
     setPhotos([]);
     setPhotoCaptions([]);
+    
+    // Close the dialog
+    onOpenChange(false);
   };
 
   return (

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
@@ -17,6 +16,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { CONSTRUCTION_PHASES } from "@/types/construction";
 import UploadEvidenceDialog from "./UploadEvidenceDialog";
+import { toast } from "sonner";
 
 interface PhotoEvidence {
   id: string;
@@ -28,6 +28,21 @@ interface PhotoEvidence {
   category: string;
   status: 'completed' | 'in_progress' | 'pending_review';
   images: { url: string; caption: string }[];
+}
+
+interface ContractorPhotoEvidenceProps {
+  projectsData?: {
+    name: string;
+    units: string[];
+  }[];
+  tasksData?: {
+    id: string;
+    title: string;
+    project: string;
+    unit: string;
+    phase: string;
+  }[];
+  onPhotoClick?: (photo: PhotoEvidence) => void;
 }
 
 const photos: PhotoEvidence[] = [
@@ -95,8 +110,7 @@ const statusColors: Record<string, string> = {
   pending_review: 'bg-blue-100 text-blue-800'
 };
 
-// Sample projects data
-const projectsData = [
+const defaultProjectsData = [
   {
     name: "Riverside Tower",
     units: ["Block A", "Block B", "Block C", "Block D"]
@@ -111,8 +125,7 @@ const projectsData = [
   }
 ];
 
-// Sample in-progress tasks
-const inProgressTasks = [
+const defaultTasksData = [
   {
     id: "task1",
     title: "Foundation concrete pouring",
@@ -136,7 +149,11 @@ const inProgressTasks = [
   }
 ];
 
-const ContractorPhotoEvidence = () => {
+const ContractorPhotoEvidence: React.FC<ContractorPhotoEvidenceProps> = ({ 
+  projectsData = defaultProjectsData,
+  tasksData = defaultTasksData,
+  onPhotoClick
+}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [projectFilter, setProjectFilter] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
@@ -156,17 +173,19 @@ const ContractorPhotoEvidence = () => {
     return matchesSearch && matchesProject && matchesCategory && matchesStatus;
   });
   
-  // Extract unique projects and categories for filters
   const projects = Array.from(new Set(photoList.map(p => p.project)));
   
   const handlePhotoUpload = (newEvidence: PhotoEvidence) => {
     setPhotoList([newEvidence, ...photoList]);
     setDialogOpen(false);
+    toast.success("Photo evidence uploaded successfully");
   };
 
   const viewPhotoDetails = (photoId: string) => {
-    // Handle photo detail view (to be implemented)
-    console.log("Viewing photo details for:", photoId);
+    const photo = photoList.find(p => p.id === photoId);
+    if (photo && onPhotoClick) {
+      onPhotoClick(photo);
+    }
   };
   
   return (
@@ -276,7 +295,7 @@ const ContractorPhotoEvidence = () => {
               <UploadEvidenceDialog 
                 onOpenChange={setDialogOpen} 
                 projects={projectsData}
-                tasks={inProgressTasks}
+                tasks={tasksData}
                 onSubmit={handlePhotoUpload}
               />
             </Dialog>

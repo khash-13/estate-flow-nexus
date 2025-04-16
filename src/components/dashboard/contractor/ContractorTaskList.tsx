@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Table, TableBody, TableCell, TableHead, 
@@ -19,6 +18,22 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import AddTaskDialog from "./AddTaskDialog";
 import UploadEvidenceDialog from "./UploadEvidenceDialog";
+
+// Sample projects data
+const projectsData = [
+  {
+    name: "Riverside Tower",
+    units: ["Block A", "Block B", "Block C", "Block D"]
+  },
+  {
+    name: "Valley Heights",
+    units: ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"]
+  },
+  {
+    name: "Green Villa",
+    units: ["Villa 1", "Villa 2", "Villa 3"]
+  }
+];
 
 interface Task {
   id: string;
@@ -130,12 +145,10 @@ const ContractorTaskList = () => {
   });
 
   const filteredTasks = tasks.filter(task => {
-    // Apply status filter
     if (filter !== 'all' && task.status !== filter) {
       return false;
     }
     
-    // Apply search query
     if (searchQuery && !task.title.toLowerCase().includes(searchQuery.toLowerCase())) {
       return false;
     }
@@ -144,7 +157,6 @@ const ContractorTaskList = () => {
   });
 
   const handleStatusChange = (taskId: string, newStatus: Task['status']) => {
-    // Update task status
     setTasks(prevTasks => 
       prevTasks.map(task => 
         task.id === taskId 
@@ -153,7 +165,6 @@ const ContractorTaskList = () => {
       )
     );
     
-    // Show notification
     const task = tasks.find(t => t.id === taskId);
     
     if (newStatus === 'completed') {
@@ -171,6 +182,30 @@ const ContractorTaskList = () => {
     setSelectedTaskId(taskId);
     setUploadEvidenceOpen(true);
   };
+
+  const handleEvidenceSubmit = (evidence: any) => {
+    console.log("Evidence submitted:", evidence);
+    
+    if (selectedTaskId) {
+      setTasks(prevTasks => 
+        prevTasks.map(task => 
+          task.id === selectedTaskId 
+            ? { ...task, hasEvidence: true } 
+            : task
+        )
+      );
+    }
+    
+    setUploadEvidenceOpen(false);
+  };
+
+  const taskForEvidence = tasks.map(task => ({
+    id: task.id,
+    title: task.title,
+    project: task.project,
+    unit: task.unit,
+    phase: task.phase
+  }));
 
   return (
     <div className="space-y-4">
@@ -314,7 +349,12 @@ const ContractorTaskList = () => {
       </div>
 
       <Dialog open={uploadEvidenceOpen} onOpenChange={setUploadEvidenceOpen}>
-        <UploadEvidenceDialog onOpenChange={setUploadEvidenceOpen} />
+        <UploadEvidenceDialog 
+          onOpenChange={setUploadEvidenceOpen} 
+          projects={projectsData}
+          tasks={taskForEvidence}
+          onSubmit={handleEvidenceSubmit}
+        />
       </Dialog>
     </div>
   );
