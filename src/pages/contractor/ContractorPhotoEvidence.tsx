@@ -1,9 +1,15 @@
 
+import { useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import ContractorPhotoEvidence from "@/components/dashboard/contractor/ContractorPhotoEvidence";
+import PhotoDetailsDialog from "@/components/dashboard/contractor/PhotoDetailsDialog";
+import { Dialog } from "@/components/ui/dialog";
 
 const ContractorPhotoEvidencePage = () => {
+  const [photoDetailsOpen, setPhotoDetailsOpen] = useState(false);
+  const [selectedPhoto, setSelectedPhoto] = useState(null);
+  
   return (
     <MainLayout>
       <div className="space-y-6 p-8">
@@ -22,6 +28,13 @@ const ContractorPhotoEvidencePage = () => {
             <ContractorPhotoEvidence />
           </CardContent>
         </Card>
+        
+        <Dialog open={photoDetailsOpen} onOpenChange={setPhotoDetailsOpen}>
+          <PhotoDetailsDialog
+            onOpenChange={setPhotoDetailsOpen}
+            photoEvidence={selectedPhoto}
+          />
+        </Dialog>
       </div>
     </MainLayout>
   );

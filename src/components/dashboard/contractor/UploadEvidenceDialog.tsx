@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription 
 } from "@/components/ui/dialog";
@@ -9,36 +9,98 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Camera, Upload, XCircle } from "lucide-react";
+import { Camera, Upload, XCircle, FileImage } from "lucide-react";
+import { CONSTRUCTION_PHASES, ConstructionPhase } from "@/types/construction";
 
 interface UploadEvidenceDialogProps {
   onOpenChange: (open: boolean) => void;
+  projects: {
+    name: string;
+    units: string[];
+  }[];
+  tasks: {
+    id: string;
+    title: string;
+    project: string;
+    unit: string;
+    phase: string;
+  }[];
+  onSubmit: (evidence: any) => void;
 }
 
-// Sample tasks in progress (in a real app, this would come from an API)
-const sampleTasksInProgress = [
-  {
-    id: "t1",
-    title: "Structural column formwork",
-    project: "Riverside Tower",
-    unit: "Block B",
-    phase: "Structural Framework"
-  },
-  {
-    id: "t2",
-    title: "Electrical conduiting - Ground Floor",
-    project: "Valley Heights",
-    unit: "Unit 3",
-    phase: "Electrical Works"
-  }
-];
+interface PhotoEvidence {
+  id: string;
+  title: string;
+  project: string;
+  unit: string;
+  task: string;
+  date: string;
+  category: string;
+  status: 'completed' | 'in_progress' | 'pending_review';
+  images: { url: string; caption: string }[];
+}
 
-const UploadEvidenceDialog = ({ onOpenChange }: UploadEvidenceDialogProps) => {
-  const [taskId, setTaskId] = useState("");
+const UploadEvidenceDialog = ({ onOpenChange, projects, tasks, onSubmit }: UploadEvidenceDialogProps) => {
+  const [title, setTitle] = useState("");
+  const [selectedProject, setSelectedProject] = useState("");
+  const [selectedUnit, setSelectedUnit] = useState("");
+  const [selectedTask, setSelectedTask] = useState("");
   const [notes, setNotes] = useState("");
   const [progressPercent, setProgressPercent] = useState("50");
-  const [newStatus, setNewStatus] = useState("in_progress");
+  const [status, setStatus] = useState<"in_progress" | "completed" | "pending_review">("in_progress");
   const [photos, setPhotos] = useState<File[]>([]);
+  const [availableUnits, setAvailableUnits] = useState<string[]>([]);
+  const [availableTasks, setAvailableTasks] = useState<typeof tasks>([]);
+  const [selectedPhase, setSelectedPhase] = useState<ConstructionPhase | "">("");
+  const [photoCaptions, setPhotoCaptions] = useState<string[]>([]);
+  
+  // Update units when project changes
+  useEffect(() => {
+    if (selectedProject) {
+      const projectData = projects.find(p => p.name === selectedProject);
+      setAvailableUnits(projectData?.units || []);
+      setSelectedUnit("");
+    } else {
+      setAvailableUnits([]);
+    }
+  }, [selectedProject, projects]);
+  
+  // Update available tasks when project and unit change
+  useEffect(() => {
+    if (selectedProject && selectedUnit) {
+      const filteredTasks = tasks.filter(t => 
+        t.project === selectedProject && t.unit === selectedUnit
+      );
+      setAvailableTasks(filteredTasks);
+      
+      if (filteredTasks.length > 0) {
+        // Auto select the first task if there's only one
+        if (filteredTasks.length === 1) {
+          setSelectedTask(filteredTasks[0].id);
+          setSelectedPhase(filteredTasks[0].phase as ConstructionPhase);
+        } else {
+          setSelectedTask("");
+        }
+      } else {
+        setSelectedTask("");
+        setSelectedPhase("");
+      }
+    } else {
+      setAvailableTasks([]);
+      setSelectedTask("");
+      setSelectedPhase("");
+    }
+  }, [selectedProject, selectedUnit, tasks]);
+  
+  // Update phase when task changes
+  useEffect(() => {
+    if (selectedTask) {
+      const task = tasks.find(t => t.id === selectedTask);
+      if (task) {
+        setSelectedPhase(task.phase as ConstructionPhase);
+      }
+    }
+  }, [selectedTask, tasks]);
   
   // Handle file upload
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,20 +108,41 @@ const UploadEvidenceDialog = ({ onOpenChange }: UploadEvidenceDialogProps) => {
       // Convert FileList to array and append to existing photos
       const newFiles = Array.from(e.target.files);
       setPhotos(prevPhotos => [...prevPhotos, ...newFiles]);
+      
+      // Add empty captions for new photos
+      setPhotoCaptions(prevCaptions => [
+        ...prevCaptions,
+        ...newFiles.map(() => "")
+      ]);
     }
   };
   
   // Remove a photo from the list
   const removePhoto = (index: number) => {
     setPhotos(prevPhotos => prevPhotos.filter((_, i) => i !== index));
+    setPhotoCaptions(prevCaptions => prevCaptions.filter((_, i) => i !== index));
+  };
+  
+  const updateCaption = (index: number, caption: string) => {
+    setPhotoCaptions(prevCaptions => prevCaptions.map((c, i) => i === index ? caption : c));
   };
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     // Validate form
-    if (!taskId) {
-      toast.error("Please select a task");
+    if (!selectedProject) {
+      toast.error("Please select a project");
+      return;
+    }
+    
+    if (!selectedUnit) {
+      toast.error("Please select a unit/block");
+      return;
+    }
+    
+    if (!title) {
+      toast.error("Please enter a title for the evidence");
       return;
     }
     
@@ -68,104 +151,207 @@ const UploadEvidenceDialog = ({ onOpenChange }: UploadEvidenceDialogProps) => {
       return;
     }
     
-    // In a real app, we would upload the photos and update the task status
+    // In a real app, we would upload the photos to storage
+    // For now, create local URLs for the photos
+    const photoUrls = photos.map((photo, index) => ({
+      url: URL.createObjectURL(photo),
+      caption: photoCaptions[index] || `Photo ${index + 1}`
+    }));
+    
+    // Create new evidence object
+    const newEvidence: PhotoEvidence = {
+      id: `pe${Date.now()}`,
+      title,
+      project: selectedProject,
+      unit: selectedUnit,
+      task: selectedTask 
+        ? tasks.find(t => t.id === selectedTask)?.title || ""
+        : "",
+      date: new Date().toISOString().split('T')[0],
+      category: selectedPhase || "other",
+      status,
+      images: photoUrls
+    };
+    
+    // Call the onSubmit handler with the new evidence
+    onSubmit(newEvidence);
     
     // Show success message
     toast.success("Evidence uploaded successfully", {
-      description: newStatus === "completed" 
+      description: status === "completed" 
         ? "Task has been marked as completed and sent for verification"
         : "Task progress has been updated"
     });
     
-    // Reset form and close dialog
-    setTaskId("");
+    // Reset form
+    setTitle("");
+    setSelectedProject("");
+    setSelectedUnit("");
+    setSelectedTask("");
     setNotes("");
     setProgressPercent("50");
-    setNewStatus("in_progress");
+    setStatus("in_progress");
     setPhotos([]);
-    onOpenChange(false);
+    setPhotoCaptions([]);
   };
 
-  const selectedTask = sampleTasksInProgress.find(task => task.id === taskId);
-
   return (
-    <DialogContent className="sm:max-w-[550px]">
+    <DialogContent className="sm:max-w-[650px]">
       <DialogHeader>
         <DialogTitle>Upload Task Evidence</DialogTitle>
         <DialogDescription>
-          Upload photos showing task progress or completion. GPS location will be automatically added.
+          Upload photos showing task progress or completion. Select the project, unit, and provide details.
         </DialogDescription>
       </DialogHeader>
       
       <form onSubmit={handleSubmit} className="space-y-4 pt-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="project">Project</Label>
+            <Select value={selectedProject} onValueChange={setSelectedProject} required>
+              <SelectTrigger id="project">
+                <SelectValue placeholder="Select a project" />
+              </SelectTrigger>
+              <SelectContent>
+                {projects.map(project => (
+                  <SelectItem key={project.name} value={project.name}>{project.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="unit">Unit/Block</Label>
+            <Select value={selectedUnit} onValueChange={setSelectedUnit} required disabled={!selectedProject}>
+              <SelectTrigger id="unit">
+                <SelectValue placeholder={selectedProject ? "Select unit/block" : "Select a project first"} />
+              </SelectTrigger>
+              <SelectContent>
+                {availableUnits.map(unit => (
+                  <SelectItem key={unit} value={unit}>{unit}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
         <div className="space-y-2">
-          <Label htmlFor="task">Select Task</Label>
-          <Select value={taskId} onValueChange={setTaskId} required>
+          <Label htmlFor="title">Evidence Title</Label>
+          <Input 
+            id="title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Enter a title for this evidence"
+            required
+          />
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="task">Related Task (Optional)</Label>
+          <Select value={selectedTask} onValueChange={setSelectedTask} disabled={!selectedUnit}>
             <SelectTrigger id="task">
-              <SelectValue placeholder="Select a task" />
+              <SelectValue placeholder={availableTasks.length > 0 ? "Select related task" : "No tasks available"} />
             </SelectTrigger>
             <SelectContent>
-              {sampleTasksInProgress.map(task => (
-                <SelectItem key={task.id} value={task.id}>
-                  {task.title} ({task.project} / {task.unit})
-                </SelectItem>
+              {availableTasks.map(task => (
+                <SelectItem key={task.id} value={task.id}>{task.title}</SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
         
-        {selectedTask && (
+        {selectedTask ? (
           <div className="bg-muted p-3 rounded-md">
-            <p className="font-medium">{selectedTask.title}</p>
-            <p className="text-sm text-muted-foreground">
-              {selectedTask.project} / {selectedTask.unit}
+            <p className="font-medium">
+              {tasks.find(t => t.id === selectedTask)?.title}
             </p>
             <p className="text-sm text-muted-foreground">
-              Phase: {selectedTask.phase}
+              Phase: {selectedPhase && CONSTRUCTION_PHASES[selectedPhase]?.title}
             </p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <Label htmlFor="phase">Construction Phase</Label>
+            <Select 
+              value={selectedPhase} 
+              onValueChange={(value) => setSelectedPhase(value as ConstructionPhase)} 
+              required={!selectedTask}
+            >
+              <SelectTrigger id="phase">
+                <SelectValue placeholder="Select construction phase" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(CONSTRUCTION_PHASES).map(([key, phase]) => (
+                  <SelectItem key={key} value={key}>{phase.title}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         )}
         
         <div className="space-y-2">
-          <Label htmlFor="status">Update Status</Label>
-          <Select value={newStatus} onValueChange={setNewStatus} required>
+          <Label htmlFor="status">Status</Label>
+          <Select value={status} onValueChange={(value) => setStatus(value as any)} required>
             <SelectTrigger id="status">
-              <SelectValue placeholder="Select new status" />
+              <SelectValue placeholder="Select status" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="in_progress">In Progress</SelectItem>
               <SelectItem value="completed">Completed</SelectItem>
+              <SelectItem value="pending_review">Pending Review</SelectItem>
             </SelectContent>
           </Select>
         </div>
         
-        <div className="space-y-2">
-          <Label htmlFor="progress">Progress Percentage</Label>
-          <div className="flex items-center space-x-2">
-            <Input 
-              id="progress" 
-              type="range" 
-              min="0" 
-              max="100" 
-              step="5"
-              className="w-full" 
-              value={progressPercent}
-              onChange={(e) => setProgressPercent(e.target.value)}
-            />
-            <span className="w-12 text-center">{progressPercent}%</span>
+        {status === "in_progress" && (
+          <div className="space-y-2">
+            <Label htmlFor="progress">Progress Percentage</Label>
+            <div className="flex items-center space-x-2">
+              <Input 
+                id="progress" 
+                type="range" 
+                min="0" 
+                max="100" 
+                step="5"
+                className="w-full" 
+                value={progressPercent}
+                onChange={(e) => setProgressPercent(e.target.value)}
+              />
+              <span className="w-12 text-center">{progressPercent}%</span>
+            </div>
           </div>
-        </div>
+        )}
         
         <div className="space-y-2">
-          <Label htmlFor="photos">Upload Photos</Label>
-          <div className="grid grid-cols-2 gap-4 mb-2">
+          <div className="flex justify-between">
+            <Label htmlFor="photos">Upload Photos</Label>
+            <span className="text-xs text-muted-foreground">{photos.length} photos selected</span>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-2">
+            {photos.length === 0 && (
+              <div className="col-span-full border-2 border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center text-muted-foreground">
+                <FileImage className="h-10 w-10 mb-2" />
+                <p className="text-sm text-center">No photos selected. Click below to upload.</p>
+              </div>
+            )}
+            
             {photos.map((photo, index) => (
-              <div key={index} className="relative rounded-md overflow-hidden border border-border">
+              <div key={index} className="relative rounded-md overflow-hidden border border-border flex flex-col">
                 <img 
                   src={URL.createObjectURL(photo)}
                   alt={`Evidence ${index + 1}`}
                   className="w-full h-32 object-cover"
                 />
+                <div className="p-2">
+                  <Input 
+                    size={1}
+                    placeholder="Add caption"
+                    value={photoCaptions[index] || ""}
+                    onChange={(e) => updateCaption(index, e.target.value)}
+                    className="text-xs"
+                  />
+                </div>
                 <Button 
                   type="button"
                   variant="ghost" 
@@ -215,7 +401,7 @@ const UploadEvidenceDialog = ({ onOpenChange }: UploadEvidenceDialogProps) => {
             onChange={handleFileChange}
           />
           <p className="text-xs text-muted-foreground">
-            Please upload clear photos showing the task progress. GPS location will be automatically added.
+            Please upload clear photos showing the construction progress. GPS location will be automatically added.
           </p>
         </div>
         

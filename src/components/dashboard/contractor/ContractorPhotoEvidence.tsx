@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
-  Search, Filter, Plus, MoreHorizontal, Calendar, Camera, Upload 
+  Search, Filter, Plus, MoreHorizontal, Calendar, Camera, Upload, Eye 
 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
@@ -14,6 +14,9 @@ import {
   DropdownMenuLabel, DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { CONSTRUCTION_PHASES } from "@/types/construction";
+import UploadEvidenceDialog from "./UploadEvidenceDialog";
 
 interface PhotoEvidence {
   id: string;
@@ -35,7 +38,7 @@ const photos: PhotoEvidence[] = [
     unit: "Block A",
     task: "Foundation concrete pouring",
     date: "2025-03-20",
-    category: "Foundation",
+    category: "groundwork_foundation",
     status: "completed",
     images: [
       { url: "/placeholder.svg", caption: "North section complete" },
@@ -49,7 +52,7 @@ const photos: PhotoEvidence[] = [
     unit: "Unit 3",
     task: "Wall framing",
     date: "2025-04-05",
-    category: "Framing",
+    category: "structural_framework",
     status: "in_progress",
     images: [
       { url: "/placeholder.svg", caption: "North wall framing" },
@@ -63,7 +66,7 @@ const photos: PhotoEvidence[] = [
     unit: "Villa 2",
     task: "Electrical installation",
     date: "2025-04-10",
-    category: "Electrical",
+    category: "electrical_works",
     status: "pending_review",
     images: [
       { url: "/placeholder.svg", caption: "Main panel wiring" },
@@ -77,7 +80,7 @@ const photos: PhotoEvidence[] = [
     unit: "Block B",
     task: "Bathroom fixtures installation",
     date: "2025-04-12",
-    category: "Plumbing",
+    category: "plumbing_works",
     status: "completed",
     images: [
       { url: "/placeholder.svg", caption: "Shower installation" },
@@ -92,13 +95,56 @@ const statusColors: Record<string, string> = {
   pending_review: 'bg-blue-100 text-blue-800'
 };
 
+// Sample projects data
+const projectsData = [
+  {
+    name: "Riverside Tower",
+    units: ["Block A", "Block B", "Block C", "Block D"]
+  },
+  {
+    name: "Valley Heights",
+    units: ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"]
+  },
+  {
+    name: "Green Villa",
+    units: ["Villa 1", "Villa 2", "Villa 3"]
+  }
+];
+
+// Sample in-progress tasks
+const inProgressTasks = [
+  {
+    id: "task1",
+    title: "Foundation concrete pouring",
+    project: "Riverside Tower",
+    unit: "Block A",
+    phase: "groundwork_foundation"
+  },
+  {
+    id: "task2",
+    title: "Wall framing",
+    project: "Valley Heights",
+    unit: "Unit 3",
+    phase: "structural_framework"
+  },
+  {
+    id: "task3",
+    title: "Electrical installation",
+    project: "Green Villa",
+    unit: "Villa 2",
+    phase: "electrical_works"
+  }
+];
+
 const ContractorPhotoEvidence = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [projectFilter, setProjectFilter] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [photoList, setPhotoList] = useState<PhotoEvidence[]>(photos);
   
-  const filteredPhotos = photos.filter(photo => {
+  const filteredPhotos = photoList.filter(photo => {
     const matchesSearch = searchQuery === '' || 
       photo.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       photo.task.toLowerCase().includes(searchQuery.toLowerCase());
@@ -111,8 +157,17 @@ const ContractorPhotoEvidence = () => {
   });
   
   // Extract unique projects and categories for filters
-  const projects = Array.from(new Set(photos.map(p => p.project)));
-  const categories = Array.from(new Set(photos.map(p => p.category)));
+  const projects = Array.from(new Set(photoList.map(p => p.project)));
+  
+  const handlePhotoUpload = (newEvidence: PhotoEvidence) => {
+    setPhotoList([newEvidence, ...photoList]);
+    setDialogOpen(false);
+  };
+
+  const viewPhotoDetails = (photoId: string) => {
+    // Handle photo detail view (to be implemented)
+    console.log("Viewing photo details for:", photoId);
+  };
   
   return (
     <div className="space-y-6">
@@ -123,7 +178,7 @@ const ContractorPhotoEvidence = () => {
             <Camera className="h-4 w-4 text-slate-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{photos.length}</div>
+            <div className="text-2xl font-bold">{photoList.length}</div>
             <p className="text-xs text-muted-foreground">Across {projects.length} projects</p>
           </CardContent>
         </Card>
@@ -134,7 +189,7 @@ const ContractorPhotoEvidence = () => {
             <Calendar className="h-4 w-4 text-amber-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{photos.filter(p => p.status === 'pending_review').length}</div>
+            <div className="text-2xl font-bold">{photoList.filter(p => p.status === 'pending_review').length}</div>
             <p className="text-xs text-muted-foreground">Awaiting inspection</p>
           </CardContent>
         </Card>
@@ -145,7 +200,15 @@ const ContractorPhotoEvidence = () => {
             <Upload className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">2</div>
+            <div className="text-2xl font-bold">
+              {photoList.filter(p => {
+                const today = new Date();
+                const photoDate = new Date(p.date);
+                const diffTime = Math.abs(today.getTime() - photoDate.getTime());
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                return diffDays <= 1;
+              }).length}
+            </div>
             <p className="text-xs text-muted-foreground">In the last 24 hours</p>
           </CardContent>
         </Card>
@@ -180,7 +243,7 @@ const ContractorPhotoEvidence = () => {
                   </div>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all-projects">All Projects</SelectItem>
+                  <SelectItem value="">All Projects</SelectItem>
                   {projects.map(project => (
                     <SelectItem key={project} value={project}>{project}</SelectItem>
                   ))}
@@ -191,22 +254,32 @@ const ContractorPhotoEvidence = () => {
                 <SelectTrigger className="w-fit">
                   <div className="flex items-center">
                     <Filter className="h-4 w-4 mr-2" />
-                    <span>{categoryFilter || 'Category'}</span>
+                    <span>{categoryFilter ? CONSTRUCTION_PHASES[categoryFilter as keyof typeof CONSTRUCTION_PHASES]?.title || categoryFilter : 'Category'}</span>
                   </div>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all-categories">All Categories</SelectItem>
-                  {categories.map(category => (
-                    <SelectItem key={category} value={category}>{category}</SelectItem>
+                  <SelectItem value="">All Categories</SelectItem>
+                  {Object.entries(CONSTRUCTION_PHASES).map(([key, phase]) => (
+                    <SelectItem key={key} value={key}>{phase.title}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Upload Photos
-            </Button>
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Upload Photos
+                </Button>
+              </DialogTrigger>
+              <UploadEvidenceDialog 
+                onOpenChange={setDialogOpen} 
+                projects={projectsData}
+                tasks={inProgressTasks}
+                onSubmit={handlePhotoUpload}
+              />
+            </Dialog>
           </div>
           
           <div className="border rounded-md">
@@ -222,68 +295,79 @@ const ContractorPhotoEvidence = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredPhotos.map((photo) => (
-                  <TableRow key={photo.id}>
-                    <TableCell>
-                      <div>
-                        <div className="font-medium">{photo.title}</div>
-                        <div className="text-xs text-muted-foreground">{photo.task}</div>
-                        <div className="text-xs text-muted-foreground mt-1">
-                          <span className="font-medium">Category:</span> {photo.category}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div>
-                        <div>{photo.project}</div>
-                        <div className="text-xs text-muted-foreground">{photo.unit}</div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {new Date(photo.date).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className={statusColors[photo.status]}>
-                        {photo.status.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        {photo.images.slice(0, 2).map((image, idx) => (
-                          <div key={idx} className="w-10 h-10 rounded overflow-hidden">
-                            <img 
-                              src={image.url} 
-                              alt={image.caption} 
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                        ))}
-                        {photo.images.length > 2 && (
-                          <div className="w-10 h-10 rounded bg-slate-100 flex items-center justify-center text-xs font-medium">
-                            +{photo.images.length - 2}
-                          </div>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem>View All Photos</DropdownMenuItem>
-                          <DropdownMenuItem>Add More Photos</DropdownMenuItem>
-                          <DropdownMenuItem>Edit Details</DropdownMenuItem>
-                          <DropdownMenuItem>Download All</DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                {filteredPhotos.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-6 text-muted-foreground">
+                      No photo evidence found matching your filters
                     </TableCell>
                   </TableRow>
-                ))}
+                ) : (
+                  filteredPhotos.map((photo) => (
+                    <TableRow key={photo.id}>
+                      <TableCell>
+                        <div>
+                          <div className="font-medium">{photo.title}</div>
+                          <div className="text-xs text-muted-foreground">{photo.task}</div>
+                          <div className="text-xs text-muted-foreground mt-1">
+                            <span className="font-medium">Category:</span> {CONSTRUCTION_PHASES[photo.category as keyof typeof CONSTRUCTION_PHASES]?.title || photo.category}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div>
+                          <div>{photo.project}</div>
+                          <div className="text-xs text-muted-foreground">{photo.unit}</div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {new Date(photo.date).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className={statusColors[photo.status]}>
+                          {photo.status.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1">
+                          {photo.images.slice(0, 2).map((image, idx) => (
+                            <div key={idx} className="w-10 h-10 rounded overflow-hidden">
+                              <img 
+                                src={image.url} 
+                                alt={image.caption} 
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          ))}
+                          {photo.images.length > 2 && (
+                            <div className="w-10 h-10 rounded bg-slate-100 flex items-center justify-center text-xs font-medium">
+                              +{photo.images.length - 2}
+                            </div>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <span className="sr-only">Open menu</span>
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuItem onClick={() => viewPhotoDetails(photo.id)}>
+                              <Eye className="h-4 w-4 mr-2" />
+                              View Details
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>Add More Photos</DropdownMenuItem>
+                            <DropdownMenuItem>Edit Details</DropdownMenuItem>
+                            <DropdownMenuItem>Download All</DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </div>
@@ -294,4 +378,3 @@ const ContractorPhotoEvidence = () => {
 };
 
 export default ContractorPhotoEvidence;
-
