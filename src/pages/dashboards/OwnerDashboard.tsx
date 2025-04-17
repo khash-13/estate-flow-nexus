@@ -20,7 +20,7 @@ const recentActivities = [
     id: "1",
     user: {
       name: "Sarah Johnson",
-      avatar: "https://ui-avatars.com/api/?name=Sarah+Johnson&background=2C7A7B&color=fff",
+      avatar: "https://ui-avatars.com/api/?name=Rakshit+Agarwal&background=2C7A7B&color=fff",
     },
     action: "approved",
     target: "Golden Heights Phase 2",
@@ -81,7 +81,7 @@ const properties: PropertyCardProps[] = [
     type: "Apartment Complex",
     units: 120,
     availableUnits: 45,
-    price: "$250,000 - $450,000",
+    price: "₹250,000 - ₹450,000",
     status: "listed",
     thumbnailUrl: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
   },
@@ -92,7 +92,7 @@ const properties: PropertyCardProps[] = [
     type: "Condominiums",
     units: 80,
     availableUnits: 12,
-    price: "$320,000 - $550,000",
+    price: "₹320,000 - ₹550,000",
     status: "under-construction",
     thumbnailUrl: "https://images.unsplash.com/photo-1564013434775-f71db0030976?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
   },
@@ -103,7 +103,7 @@ const properties: PropertyCardProps[] = [
     type: "Luxury Apartments",
     units: 60,
     availableUnits: 20,
-    price: "$400,000 - $750,000",
+    price: "₹400,000 - ₹750,000",
     status: "listed",
     thumbnailUrl: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
   },
@@ -114,7 +114,7 @@ const properties: PropertyCardProps[] = [
     type: "Villas",
     units: 40,
     availableUnits: 28,
-    price: "$600,000 - $1,200,000",
+    price: "₹600,000 - $₹,200,000",
     status: "under-construction",
     thumbnailUrl: "https://images.unsplash.com/photo-1600573472550-8090b5e0745e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
   },
@@ -154,7 +154,7 @@ const OwnerDashboard = () => {
         <Link to="/sales" className="block">
           <StatCard
             title="Total Sales Value"
-            value="$14.3M"
+            value="₹214.3M"
             icon={<DollarSign className="h-6 w-6 text-estate-teal" />}
             trend={{ value: 8.2, isPositive: true }}
           />
