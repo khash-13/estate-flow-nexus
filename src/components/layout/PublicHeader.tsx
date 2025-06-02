@@ -39,7 +39,7 @@ const PublicHeader = () => {
             <div className="flex items-center space-x-4">
               <div className="flex items-center">
                 <Phone className="h-4 w-4 mr-1" />
-                <span>+91 12345 67890</span>
+                <span>+91 6300380596</span>
               </div>
               <div className="flex items-center">
                 <Mail className="h-4 w-4 mr-1" />
