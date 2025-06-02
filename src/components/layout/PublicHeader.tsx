@@ -43,7 +43,7 @@ const PublicHeader = () => {
               </div>
               <div className="flex items-center">
                 <Mail className="h-4 w-4 mr-1" />
-                <span>info@estatecorp.com</span>
+                <span>info@cskrealtors.com</span>
               </div>
             </div>
             <Button variant="outline" size="sm" asChild>
