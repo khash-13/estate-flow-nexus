@@ -15,6 +15,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import Invoices from "./pages/Invoices";
 import Payments from "./pages/Payments";
 import Reports from "./pages/Reports";
+import Settings from "./pages/Settings";
 
 // Owner specific pages
 import BusinessAnalytics from "./pages/BusinessAnalytics";
@@ -26,6 +27,10 @@ import Finances from "./pages/Finances";
 // Sales Manager specific pages
 import SalesPipeline from "./pages/SalesPipeline";
 import TeamManagement from "./pages/TeamManagement";
+
+// Team Lead specific pages
+import CarAllocation from "./pages/CarAllocation";
+import Approvals from "./pages/Approvals";
 
 // Agent specific pages
 import LeadManagement from "./pages/agent/LeadManagement";
