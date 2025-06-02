@@ -4,7 +4,7 @@ import {
   Calendar, Settings, CreditCard, Map, CheckSquare, UserPlus, 
   ClipboardList, HelpCircle, LayoutDashboard, Briefcase, 
   Hammer, Construction, ListTodo, Receipt, Camera, AlertTriangle,
-  Clock, Gauge, CheckCircle
+  Clock, Gauge, CheckCircle, Car
 } from "lucide-react";
 import { UserRole } from "@/contexts/AuthContext";
 
@@ -42,7 +42,7 @@ export const navigationByRole: Record<UserRole, Array<{ to: string; icon: React.
     { to: "/", icon: LayoutDashboard, label: "Team Dashboard" },
     { to: "/team", icon: Users, label: "My Team" },
     { to: "/visits", icon: Map, label: "Site Visits" },
-    { to: "/vehicles", icon: Briefcase, label: "Car Allocation" },
+    { to: "/vehicles", icon: Car, label: "Car Allocation" },
     { to: "/approvals", icon: CheckSquare, label: "Approvals" },
     { to: "/properties", icon: Building, label: "Properties" },
     { to: "/messaging", icon: MessageCircle, label: "Communications" },
