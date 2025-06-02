@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -54,6 +55,16 @@ import SiteInspections from "./pages/siteincharge/SiteInspections";
 import ContractorsList from "./pages/siteincharge/ContractorsList";
 import ConstructionProgress from "./pages/siteincharge/ConstructionProgress";
 
+// Public pages
+import HomePage from "./pages/public/HomePage";
+import PublicAboutPage from "./pages/public/AboutPage";
+import PublicPropertiesPage from "./pages/public/PropertiesPage";
+import CompletedProjectsPage from "./pages/public/CompletedProjectsPage";
+import OngoingProjectsPage from "./pages/public/OngoingProjectsPage";
+import UpcomingProjectsPage from "./pages/public/UpcomingProjectsPage";
+import OpenPlotsPage from "./pages/public/OpenPlotsPage";
+import ContactPage from "./pages/public/ContactPage";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -64,6 +75,17 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
+            {/* Public Routes */}
+            <Route path="/public" element={<HomePage />} />
+            <Route path="/public/about" element={<PublicAboutPage />} />
+            <Route path="/public/properties" element={<PublicPropertiesPage />} />
+            <Route path="/public/completed-projects" element={<CompletedProjectsPage />} />
+            <Route path="/public/ongoing-projects" element={<OngoingProjectsPage />} />
+            <Route path="/public/upcoming-projects" element={<UpcomingProjectsPage />} />
+            <Route path="/public/open-plots" element={<OpenPlotsPage />} />
+            <Route path="/public/contact" element={<ContactPage />} />
+            
+            {/* Admin Routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/unauthorized" element={<Unauthorized />} />
             <Route path="/" element={<Dashboard />} />
