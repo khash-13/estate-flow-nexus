@@ -23,6 +23,10 @@ import SalesOverview from "./pages/SalesOverview";
 import OperationsWorkflow from "./pages/OperationsWorkflow";
 import Finances from "./pages/Finances";
 
+// Sales Manager specific pages
+import SalesPipeline from "./pages/SalesPipeline";
+import TeamManagement from "./pages/TeamManagement";
+
 // Agent specific pages
 import LeadManagement from "./pages/agent/LeadManagement";
 import MySchedule from "./pages/agent/MySchedule";
