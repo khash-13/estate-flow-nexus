@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Settings, Database, Mail, Shield, Bell, Globe,
+  Settings as SettingsIcon, Database, Mail, Shield, Bell, Globe,
   Users, Building, CreditCard, FileText, Save
 } from "lucide-react";
 import { useState } from "react";
@@ -273,7 +273,7 @@ const Settings = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <Settings className="mr-2 h-5 w-5" />
+                  <SettingsIcon className="mr-2 h-5 w-5" />
                   Maintenance Mode
                 </CardTitle>
               </CardHeader>
