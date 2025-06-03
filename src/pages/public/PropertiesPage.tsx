@@ -83,12 +83,11 @@ const PropertiesPage = () => {
                 />
               </div>
               
-              <Select onValueChange={setSelectedType}>
+              <Select onValueChange={setSelectedType} value={selectedType}>
                 <SelectTrigger>
                   <SelectValue placeholder="Property Type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Types</SelectItem>
                   <SelectItem value="Completed">Completed</SelectItem>
                   <SelectItem value="Ongoing">Ongoing</SelectItem>
                   <SelectItem value="Upcoming">Upcoming</SelectItem>
@@ -96,12 +95,11 @@ const PropertiesPage = () => {
                 </SelectContent>
               </Select>
 
-              <Select onValueChange={setSelectedLocation}>
+              <Select onValueChange={setSelectedLocation} value={selectedLocation}>
                 <SelectTrigger>
                   <SelectValue placeholder="Location" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Locations</SelectItem>
                   <SelectItem value="Gurgaon">Gurgaon</SelectItem>
                   <SelectItem value="Kolkata">Kolkata</SelectItem>
                   <SelectItem value="Bangalore">Bangalore</SelectItem>
@@ -109,12 +107,11 @@ const PropertiesPage = () => {
                 </SelectContent>
               </Select>
 
-              <Select onValueChange={setSelectedBudget}>
+              <Select onValueChange={setSelectedBudget} value={selectedBudget}>
                 <SelectTrigger>
                   <SelectValue placeholder="Budget" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Budgets</SelectItem>
                   <SelectItem value="below-50">Below ₹50L</SelectItem>
                   <SelectItem value="50-75">₹50L - ₹75L</SelectItem>
                   <SelectItem value="75-100">₹75L - ₹1Cr</SelectItem>
@@ -122,9 +119,14 @@ const PropertiesPage = () => {
                 </SelectContent>
               </Select>
 
-              <Button>
+              <Button onClick={() => {
+                setSearchTerm("");
+                setSelectedType("");
+                setSelectedLocation("");
+                setSelectedBudget("");
+              }}>
                 <Filter className="mr-2 h-4 w-4" />
-                Apply Filters
+                Clear Filters
               </Button>
             </div>
           </div>
