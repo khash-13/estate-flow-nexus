@@ -11,6 +11,7 @@ import MessagingPage from "./pages/MessagingPage";
 import Properties from "./pages/Properties";
 import PropertyDetails from "./pages/Properties/PropertyDetails";
 import NotFound from "./pages/NotFound";
+import Profile from "./pages/Profile";
 import { AuthProvider } from "./contexts/AuthContext";
 import Invoices from "./pages/Invoices";
 import Payments from "./pages/Payments";
@@ -95,6 +96,7 @@ const App = () => (
             <Route path="/unauthorized" element={<Unauthorized />} />
             <Route path="/" element={<Dashboard />} />
             <Route path="/messaging" element={<MessagingPage />} />
+            <Route path="/profile" element={<Profile />} />
             
             {/* Property Routes */}
             <Route path="/properties" element={<Properties />} />
