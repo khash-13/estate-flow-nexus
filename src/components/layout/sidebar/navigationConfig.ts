@@ -4,7 +4,7 @@ import {
   Calendar, Settings, CreditCard, Map, CheckSquare, UserPlus, 
   ClipboardList, HelpCircle, LayoutDashboard, Briefcase, 
   Hammer, Construction, ListTodo, Receipt, Camera, AlertTriangle,
-  Clock, Gauge, CheckCircle, Car
+  Clock, Gauge, CheckCircle, Car, Calculator, DollarSign
 } from "lucide-react";
 import { UserRole } from "@/contexts/AuthContext";
 
@@ -83,9 +83,9 @@ export const navigationByRole: Record<UserRole, Array<{ to: string; icon: React.
     { to: "/", icon: LayoutDashboard, label: "Finance Dashboard" },
     { to: "/invoices", icon: FileText, label: "Invoice Management" },
     { to: "/payments", icon: CreditCard, label: "Payments" },
-    { to: "/reports", icon: BarChart3, label: "Financial Reports" },
     { to: "/budgets", icon: ClipboardList, label: "Budget Tracking" },
-    { to: "/taxes", icon: FileText, label: "Tax Documents" },
+    { to: "/taxes", icon: Calculator, label: "Tax Documents" },
+    { to: "/reports", icon: BarChart3, label: "Financial Reports" },
     { to: "/messaging", icon: MessageCircle, label: "Communications" },
   ],
   customer_purchased: [

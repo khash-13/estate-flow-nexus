@@ -1,9 +1,11 @@
 
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import StatCard from "@/components/dashboard/StatCard";
 import ActivityFeed from "@/components/dashboard/ActivityFeed";
-import { FileText, CreditCard, BarChart3, Calculator, Receipt, ClipboardList } from "lucide-react";
+import { FileText, CreditCard, BarChart3, Calculator, Receipt, ClipboardList, TrendingUp, AlertTriangle, DollarSign } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   Tabs,
   TabsContent,
@@ -48,6 +50,13 @@ const recentActivities = [
   },
 ];
 
+const quickActions = [
+  { title: "Budget Tracking", description: "Monitor budgets and cash flow", link: "/budgets", icon: ClipboardList },
+  { title: "Tax Documents", description: "Manage GST, TDS, and Income Tax", link: "/taxes", icon: Calculator },
+  { title: "Financial Reports", description: "Generate financial reports", link: "/reports", icon: BarChart3 },
+  { title: "Invoice Management", description: "Create and manage invoices", link: "/invoices", icon: FileText },
+];
+
 const AccountantDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
 
@@ -79,13 +88,13 @@ const AccountantDashboard = () => {
         />
         <StatCard
           title="Monthly Revenue"
-          value="$124.5K"
+          value="₹124.5L"
           icon={<CreditCard className="h-6 w-6 text-estate-teal" />}
           trend={{ value: 8.4, isPositive: true }}
         />
         <StatCard
           title="Overdue Payments"
-          value="$32.8K"
+          value="₹32.8L"
           icon={<Receipt className="h-6 w-6 text-estate-error" />}
           trend={{ value: 2.1, isPositive: false }}
         />
@@ -96,6 +105,32 @@ const AccountantDashboard = () => {
           trend={{ value: 1.8, isPositive: true }}
         />
       </div>
+
+      {/* Quick Actions Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Quick Actions</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {quickActions.map((action) => (
+              <Link key={action.title} to={action.link}>
+                <Card className="hover:shadow-md transition-shadow cursor-pointer">
+                  <CardContent className="p-4">
+                    <div className="flex items-center space-x-3">
+                      <action.icon className="h-8 w-8 text-estate-navy" />
+                      <div>
+                        <h3 className="font-medium">{action.title}</h3>
+                        <p className="text-sm text-muted-foreground">{action.description}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
@@ -116,8 +151,11 @@ const AccountantDashboard = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Recent Invoices</CardTitle>
+            <Link to="/invoices">
+              <Button variant="outline" size="sm">View All</Button>
+            </Link>
           </CardHeader>
           <CardContent>
             <div className="h-60 flex flex-col gap-2">
@@ -134,7 +172,7 @@ const AccountantDashboard = () => {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-medium">${(Math.random() * 10000).toFixed(2)}</p>
+                    <p className="text-sm font-medium">₹{(Math.random() * 1000000).toFixed(0)}</p>
                     <p className="text-xs text-estate-teal">Pending</p>
                   </div>
                 </div>
@@ -143,13 +181,42 @@ const AccountantDashboard = () => {
           </CardContent>
         </Card>
         <Card>
-          <CardHeader>
-            <CardTitle>Budget Tracking</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Tax Compliance</CardTitle>
+            <Link to="/taxes">
+              <Button variant="outline" size="sm">Manage</Button>
+            </Link>
           </CardHeader>
           <CardContent>
-            <div className="h-60 flex items-center justify-center bg-muted/50 rounded-md">
-              <ClipboardList className="h-12 w-12 text-estate-navy/20" />
-              <p className="text-muted-foreground ml-2">Budget tracking details</p>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Calculator className="h-4 w-4" />
+                  <span className="text-sm">GST Returns</span>
+                </div>
+                <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">Filed</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  <span className="text-sm">TDS Returns</span>
+                </div>
+                <span className="text-xs text-yellow-600 bg-yellow-100 px-2 py-1 rounded">Pending</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <BarChart3 className="h-4 w-4" />
+                  <span className="text-sm">Income Tax</span>
+                </div>
+                <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">Completed</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4" />
+                  <span className="text-sm">Audit Status</span>
+                </div>
+                <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">In Progress</span>
+              </div>
             </div>
           </CardContent>
         </Card>

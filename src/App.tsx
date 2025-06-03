@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -54,6 +55,10 @@ import QualityControl from "./pages/siteincharge/QualityControl";
 import SiteInspections from "./pages/siteincharge/SiteInspections";
 import ContractorsList from "./pages/siteincharge/ContractorsList";
 import ConstructionProgress from "./pages/siteincharge/ConstructionProgress";
+
+// Accountant specific pages
+import BudgetTracking from "./pages/BudgetTracking";
+import TaxDocuments from "./pages/TaxDocuments";
 
 // Public pages
 import HomePage from "./pages/public/HomePage";
