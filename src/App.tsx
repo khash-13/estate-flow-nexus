@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -16,6 +15,7 @@ import Invoices from "./pages/Invoices";
 import Payments from "./pages/Payments";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
+import ContentManagement from "./pages/ContentManagement";
 
 // Owner specific pages
 import BusinessAnalytics from "./pages/BusinessAnalytics";
@@ -94,6 +94,9 @@ const App = () => (
             {/* Property Routes */}
             <Route path="/properties" element={<Properties />} />
             <Route path="/properties/:propertyId" element={<PropertyDetails />} />
+            
+            {/* CMS Route */}
+            <Route path="/content" element={<ContentManagement />} />
             
             {/* Owner & Admin Routes */}
             <Route path="/analytics" element={<BusinessAnalytics />} />
