@@ -3,8 +3,6 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -23,24 +21,14 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import {
   PlusCircle,
-  TrendingUp,
-  TrendingDown,
-  DollarSign,
-  Calendar,
-  AlertTriangle,
-  FileText,
   BarChart3,
   PieChart,
+  FileText,
 } from "lucide-react";
+import BudgetOverviewCards from "@/components/budget/BudgetOverviewCards";
+import BudgetVarianceChart from "@/components/budget/BudgetVarianceChart";
+import ExpenseForm from "@/components/budget/ExpenseForm";
 
 // Sample data
 const budgetCategories = [
@@ -68,25 +56,13 @@ const expenseTransactions = [
 
 const BudgetTracking = () => {
   const [activeTab, setActiveTab] = useState("overview");
-  const [newExpense, setNewExpense] = useState({
-    category: "",
-    amount: "",
-    vendor: "",
-    description: "",
-    date: "",
-  });
-
-  const handleAddExpense = () => {
-    console.log("Adding expense:", newExpense);
-    // Reset form
-    setNewExpense({
-      category: "",
-      amount: "",
-      vendor: "",
-      description: "",
-      date: "",
-    });
+  
+  const handleAddExpense = (expense: any) => {
+    console.log("Adding expense:", expense);
   };
+
+  const totalBudget = budgetCategories.reduce((sum, cat) => sum + cat.budgeted, 0);
+  const totalSpent = budgetCategories.reduce((sum, cat) => sum + cat.spent, 0);
 
   return (
     <div className="p-6 space-y-6">
@@ -108,65 +84,7 @@ const BudgetTracking = () => {
             <DialogHeader>
               <DialogTitle>Add New Expense</DialogTitle>
             </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="category">Category</Label>
-                <Select value={newExpense.category} onValueChange={(value) => 
-                  setNewExpense({ ...newExpense, category: value })
-                }>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="marketing">Marketing</SelectItem>
-                    <SelectItem value="construction">Construction</SelectItem>
-                    <SelectItem value="operations">Operations</SelectItem>
-                    <SelectItem value="sales">Sales</SelectItem>
-                    <SelectItem value="administration">Administration</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="amount">Amount (₹)</Label>
-                <Input
-                  id="amount"
-                  type="number"
-                  value={newExpense.amount}
-                  onChange={(e) => setNewExpense({ ...newExpense, amount: e.target.value })}
-                  placeholder="Enter amount"
-                />
-              </div>
-              <div>
-                <Label htmlFor="vendor">Vendor</Label>
-                <Input
-                  id="vendor"
-                  value={newExpense.vendor}
-                  onChange={(e) => setNewExpense({ ...newExpense, vendor: e.target.value })}
-                  placeholder="Vendor name"
-                />
-              </div>
-              <div>
-                <Label htmlFor="date">Date</Label>
-                <Input
-                  id="date"
-                  type="date"
-                  value={newExpense.date}
-                  onChange={(e) => setNewExpense({ ...newExpense, date: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  value={newExpense.description}
-                  onChange={(e) => setNewExpense({ ...newExpense, description: e.target.value })}
-                  placeholder="Expense description"
-                />
-              </div>
-              <Button onClick={handleAddExpense} className="w-full">
-                Add Expense
-              </Button>
-            </div>
+            <ExpenseForm onSubmit={handleAddExpense} />
           </DialogContent>
         </Dialog>
       </div>
@@ -180,74 +98,15 @@ const BudgetTracking = () => {
         </TabsList>
 
         <TabsContent value="overview">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Budget</CardTitle>
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">₹7,50,000</div>
-                <p className="text-xs text-muted-foreground">Current month</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Spent</CardTitle>
-                <TrendingDown className="h-4 w-4 text-red-500" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">₹7,62,000</div>
-                <p className="text-xs text-red-500">+1.6% over budget</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Net Cash Flow</CardTitle>
-                <TrendingUp className="h-4 w-4 text-green-500" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">₹2,50,000</div>
-                <p className="text-xs text-green-500">+12% from last month</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Pending Approvals</CardTitle>
-                <AlertTriangle className="h-4 w-4 text-yellow-500" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">5</div>
-                <p className="text-xs text-muted-foreground">Expenses awaiting approval</p>
-              </CardContent>
-            </Card>
-          </div>
+          <BudgetOverviewCards 
+            totalBudget={totalBudget}
+            totalSpent={totalSpent}
+            netCashFlow={250000}
+            pendingApprovals={5}
+          />
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Budget Variance by Category</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {budgetCategories.map((category) => (
-                    <div key={category.id} className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span>{category.name}</span>
-                        <span className={category.variance > 0 ? "text-red-500" : "text-green-500"}>
-                          ₹{Math.abs(category.variance).toLocaleString()}
-                          {category.variance > 0 ? " over" : " under"}
-                        </span>
-                      </div>
-                      <Progress 
-                        value={(category.spent / category.budgeted) * 100} 
-                        className="h-2"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            <BudgetVarianceChart categories={budgetCategories} />
 
             <Card>
               <CardHeader>

@@ -35,11 +35,11 @@ import {
   Calendar,
   AlertCircle,
   CheckCircle,
-  Calculator,
-  Receipt,
   PlusCircle,
   Eye,
 } from "lucide-react";
+import TaxOverviewCards from "@/components/tax/TaxOverviewCards";
+import TaxCalculator from "@/components/tax/TaxCalculator";
 
 // Sample data for Indian tax documents
 const gstReturns = [
@@ -159,49 +159,12 @@ const TaxDocuments = () => {
         </Dialog>
       </div>
 
-      {/* Tax Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">GST Collected</CardTitle>
-            <Receipt className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">₹3,24,000</div>
-            <p className="text-xs text-muted-foreground">Current quarter</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">TDS Deducted</CardTitle>
-            <Calculator className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">₹95,000</div>
-            <p className="text-xs text-muted-foreground">Current quarter</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Returns</CardTitle>
-            <AlertCircle className="h-4 w-4 text-yellow-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">2</div>
-            <p className="text-xs text-yellow-500">Due this month</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Compliance Score</CardTitle>
-            <CheckCircle className="h-4 w-4 text-green-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">95%</div>
-            <p className="text-xs text-green-500">Excellent compliance</p>
-          </CardContent>
-        </Card>
-      </div>
+      <TaxOverviewCards 
+        gstCollected={324000}
+        tdsDeducted={95000}
+        pendingReturns={2}
+        complianceScore={95}
+      />
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-4">
@@ -312,39 +275,7 @@ const TaxDocuments = () => {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>TDS Calculator</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <Label htmlFor="section">TDS Section</Label>
-                    <Select>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select section" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="194c">194C - Contractor Payments</SelectItem>
-                        <SelectItem value="194i">194I - Rent Payments</SelectItem>
-                        <SelectItem value="194j">194J - Professional Services</SelectItem>
-                        <SelectItem value="194h">194H - Commission/Brokerage</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="amount">Payment Amount (₹)</Label>
-                    <Input id="amount" type="number" placeholder="Enter amount" />
-                  </div>
-                  <div className="flex items-end">
-                    <Button>
-                      <Calculator className="h-4 w-4 mr-2" />
-                      Calculate TDS
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <TaxCalculator />
           </div>
         </TabsContent>
 
