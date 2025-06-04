@@ -1,4 +1,3 @@
-
 import { 
   BarChart3, Building, Users, Home, FileText, MessageCircle, 
   Calendar, Settings, CreditCard, Map, CheckSquare, UserPlus, 
@@ -15,6 +14,7 @@ export const navigationByRole: Record<UserRole, Array<{ to: string; icon: React.
     { to: "/analytics", icon: BarChart3, label: "Business Analytics" },
     { to: "/properties", icon: Building, label: "Properties" },
     { to: "/users", icon: Users, label: "User Management" },
+    { to: "/roles", icon: Hammer, label: "Role Management" },
     { to: "/sales", icon: CreditCard, label: "Sales Overview" },
     { to: "/operations", icon: CheckSquare, label: "Operations" },
     { to: "/finances", icon: CreditCard, label: "Finances" },
@@ -25,6 +25,7 @@ export const navigationByRole: Record<UserRole, Array<{ to: string; icon: React.
   admin: [
     { to: "/", icon: LayoutDashboard, label: "Admin Dashboard" },
     { to: "/users", icon: Users, label: "User Management" },
+    { to: "/roles", icon: Hammer, label: "Role Management" },
     { to: "/properties", icon: Building, label: "Properties" },
     { to: "/content", icon: FileText, label: "CMS" },
     { to: "/messaging", icon: MessageCircle, label: "Communications" },

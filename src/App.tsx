@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -18,6 +17,7 @@ import Payments from "./pages/Payments";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 import ContentManagement from "./pages/ContentManagement";
+import RoleManagement from "./pages/RoleManagement";
 
 // Owner specific pages
 import BusinessAnalytics from "./pages/BusinessAnalytics";
@@ -108,6 +108,7 @@ const App = () => (
             {/* Owner & Admin Routes */}
             <Route path="/analytics" element={<BusinessAnalytics />} />
             <Route path="/users" element={<UserManagement />} />
+            <Route path="/roles" element={<RoleManagement />} />
             <Route path="/sales" element={<SalesOverview />} />
             <Route path="/operations" element={<OperationsWorkflow />} />
             <Route path="/finances" element={<Finances />} />
