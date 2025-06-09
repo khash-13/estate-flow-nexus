@@ -31,7 +31,7 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/AuthContext";
 import { Property } from "@/types/property";
-import { formatCurrency } from "@/lib/utils";
+import { formatIndianCurrency } from "@/lib/formatCurrency";
 
 // Helper to render status badges with appropriate colors
 function getStatusBadge(status: string) {
@@ -147,7 +147,7 @@ export function PropertyDetails({
                 </div>
                 <div className="flex items-center">
                   <DollarSign className="h-5 w-5 mr-2 text-muted-foreground" />
-                  <span>Total: {formatCurrency(property.totalAmount)}</span>
+                  <span>Total: {formatIndianCurrency(property.totalAmount)}</span>
                 </div>
               </div>
 
@@ -208,16 +208,16 @@ export function PropertyDetails({
               <div className="grid grid-cols-1 gap-4">
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">Total Amount</p>
-                  <p className="font-medium text-lg">{formatCurrency(property.totalAmount)}</p>
+                  <p className="font-medium text-lg">{formatIndianCurrency(property.totalAmount)}</p>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">Amount Received</p>
-                    <p className="font-medium text-green-600">{formatCurrency(property.amountReceived)}</p>
+                    <p className="font-medium text-green-600">{formatIndianCurrency(property.amountReceived)}</p>
                   </div>
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">Balance Amount</p>
-                    <p className="font-medium text-red-600">{formatCurrency(property.balanceAmount)}</p>
+                    <p className="font-medium text-red-600">{formatIndianCurrency(property.balanceAmount)}</p>
                   </div>
                 </div>
                 <div className="space-y-1">

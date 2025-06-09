@@ -9,6 +9,11 @@ import {
   Dialog, DialogContent, DialogDescription, DialogFooter, 
   DialogHeader, DialogTitle, DialogTrigger 
 } from "@/components/ui/dialog";
+import { 
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, 
+  AlertDialogTitle, AlertDialogTrigger 
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,7 +24,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { 
   UserPlus, Search, Filter, MoreVertical, 
-  Edit, Trash2, User, Mail, Phone 
+  Edit, Trash2, User, Mail, Phone, KeyRound, RotateCcw 
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UserRole } from "@/contexts/AuthContext";
@@ -33,7 +38,7 @@ const sampleUsers = [
     role: "owner",
     status: "active",
     lastLogin: "2 hours ago",
-    phone: "+1 555-123-4567",
+    phone: "+91 98765 43210",
   },
   {
     id: "2",
@@ -42,7 +47,7 @@ const sampleUsers = [
     role: "admin",
     status: "active",
     lastLogin: "1 day ago",
-    phone: "+1 555-234-5678",
+    phone: "+91 98765 43211",
   },
   {
     id: "3",
@@ -51,7 +56,7 @@ const sampleUsers = [
     role: "sales_manager",
     status: "active",
     lastLogin: "3 hours ago",
-    phone: "+1 555-345-6789",
+    phone: "+91 98765 43212",
   },
   {
     id: "4",
@@ -60,7 +65,7 @@ const sampleUsers = [
     role: "team_lead",
     status: "active",
     lastLogin: "5 hours ago",
-    phone: "+1 555-456-7890",
+    phone: "+91 98765 43213",
   },
   {
     id: "5",
@@ -69,7 +74,7 @@ const sampleUsers = [
     role: "agent",
     status: "active",
     lastLogin: "2 days ago",
-    phone: "+1 555-567-8901",
+    phone: "+91 98765 43214",
   },
   {
     id: "6",
@@ -78,7 +83,7 @@ const sampleUsers = [
     role: "site_incharge",
     status: "active",
     lastLogin: "1 week ago",
-    phone: "+1 555-678-9012",
+    phone: "+91 98765 43215",
   },
   {
     id: "7",
@@ -87,7 +92,7 @@ const sampleUsers = [
     role: "agent",
     status: "inactive",
     lastLogin: "2 weeks ago",
-    phone: "+1 555-789-0123",
+    phone: "+91 98765 43216",
   },
   {
     id: "8",
@@ -96,7 +101,7 @@ const sampleUsers = [
     role: "accountant",
     status: "active",
     lastLogin: "1 day ago",
-    phone: "+1 555-890-1234",
+    phone: "+91 98765 43217",
   },
   {
     id: "9",
@@ -105,7 +110,7 @@ const sampleUsers = [
     role: "contractor",
     status: "active",
     lastLogin: "4 days ago",
-    phone: "+1 555-901-2345",
+    phone: "+91 98765 43218",
   }
 ];
 
@@ -113,11 +118,20 @@ const UserManagement = () => {
   const [users, setUsers] = useState(sampleUsers);
   const [searchQuery, setSearchQuery] = useState("");
   const [showAddUserDialog, setShowAddUserDialog] = useState(false);
+  const [showEditUserDialog, setShowEditUserDialog] = useState(false);
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
   const [newUser, setNewUser] = useState({
     name: "",
     email: "",
     role: "agent" as UserRole,
     phone: "",
+    password: "",
+  });
+  const [editUser, setEditUser] = useState<any>({});
+  const [passwordData, setPasswordData] = useState({
+    newPassword: "",
+    confirmPassword: "",
   });
 
   const filteredUsers = users.filter(user => {
@@ -129,6 +143,11 @@ const UserManagement = () => {
   });
 
   const handleAddUser = () => {
+    if (newUser.password.length < 6) {
+      toast.error("Password must be at least 6 characters long");
+      return;
+    }
+
     const id = (users.length + 1).toString();
     const createdUser = {
       id,
@@ -148,7 +167,17 @@ const UserManagement = () => {
       email: "",
       role: "agent" as UserRole,
       phone: "",
+      password: "",
     });
+  };
+
+  const handleEditUser = () => {
+    setUsers(users.map(user => 
+      user.id === editUser.id ? { ...user, ...editUser } : user
+    ));
+    toast.success("User updated successfully");
+    setShowEditUserDialog(false);
+    setEditUser({});
   };
 
   const handleDeleteUser = (userId: string, userName: string) => {
@@ -156,6 +185,34 @@ const UserManagement = () => {
     toast.success("User deleted", {
       description: `${userName} has been removed from the system`,
     });
+  };
+
+  const handlePasswordReset = () => {
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+    if (passwordData.newPassword.length < 6) {
+      toast.error("Password must be at least 6 characters long");
+      return;
+    }
+
+    toast.success("Password reset successfully", {
+      description: `Password has been reset for ${selectedUser?.name}`,
+    });
+    setShowPasswordDialog(false);
+    setPasswordData({ newPassword: "", confirmPassword: "" });
+    setSelectedUser(null);
+  };
+
+  const openEditDialog = (user: any) => {
+    setEditUser({ ...user });
+    setShowEditUserDialog(true);
+  };
+
+  const openPasswordDialog = (user: any) => {
+    setSelectedUser(user);
+    setShowPasswordDialog(true);
   };
 
   const getRoleBadgeColor = (role: string) => {
@@ -239,7 +296,17 @@ const UserManagement = () => {
                       type="tel"
                       value={newUser.phone}
                       onChange={(e) => setNewUser({ ...newUser, phone: e.target.value })}
-                      placeholder="+1 555-123-4567"
+                      placeholder="+91 98765 43210"
+                    />
+                  </div>
+                  <div className="grid items-center gap-2">
+                    <Label htmlFor="password">Password</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      value={newUser.password}
+                      onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                      placeholder="Minimum 6 characters"
                     />
                   </div>
                   <div className="grid items-center gap-2">
@@ -269,7 +336,7 @@ const UserManagement = () => {
                     Cancel
                   </Button>
                   <Button onClick={handleAddUser} disabled={
-                    !newUser.name || !newUser.email || !newUser.role || !newUser.phone
+                    !newUser.name || !newUser.email || !newUser.role || !newUser.phone || !newUser.password
                   }>
                     Create User
                   </Button>
@@ -278,6 +345,131 @@ const UserManagement = () => {
             </Dialog>
           </div>
         </div>
+
+        {/* Edit User Dialog */}
+        <Dialog open={showEditUserDialog} onOpenChange={setShowEditUserDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit User</DialogTitle>
+              <DialogDescription>
+                Update user information and role.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid items-center gap-2">
+                <Label htmlFor="edit-name">Full Name</Label>
+                <Input
+                  id="edit-name"
+                  value={editUser.name || ""}
+                  onChange={(e) => setEditUser({ ...editUser, name: e.target.value })}
+                />
+              </div>
+              <div className="grid items-center gap-2">
+                <Label htmlFor="edit-email">Email</Label>
+                <Input
+                  id="edit-email"
+                  type="email"
+                  value={editUser.email || ""}
+                  onChange={(e) => setEditUser({ ...editUser, email: e.target.value })}
+                />
+              </div>
+              <div className="grid items-center gap-2">
+                <Label htmlFor="edit-phone">Phone Number</Label>
+                <Input
+                  id="edit-phone"
+                  type="tel"
+                  value={editUser.phone || ""}
+                  onChange={(e) => setEditUser({ ...editUser, phone: e.target.value })}
+                />
+              </div>
+              <div className="grid items-center gap-2">
+                <Label htmlFor="edit-role">Role</Label>
+                <Select
+                  value={editUser.role || ""}
+                  onValueChange={(value) => setEditUser({ ...editUser, role: value })}
+                >
+                  <SelectTrigger id="edit-role">
+                    <SelectValue placeholder="Select a role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="admin">Administrator</SelectItem>
+                    <SelectItem value="sales_manager">Sales Manager</SelectItem>
+                    <SelectItem value="team_lead">Team Lead</SelectItem>
+                    <SelectItem value="agent">Agent</SelectItem>
+                    <SelectItem value="site_incharge">Site Incharge</SelectItem>
+                    <SelectItem value="contractor">Contractor</SelectItem>
+                    <SelectItem value="accountant">Accountant</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid items-center gap-2">
+                <Label htmlFor="edit-status">Status</Label>
+                <Select
+                  value={editUser.status || ""}
+                  onValueChange={(value) => setEditUser({ ...editUser, status: value })}
+                >
+                  <SelectTrigger id="edit-status">
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="inactive">Inactive</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowEditUserDialog(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleEditUser}>
+                Update User
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Password Reset Dialog */}
+        <Dialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Reset Password</DialogTitle>
+              <DialogDescription>
+                Set a new password for {selectedUser?.name}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid items-center gap-2">
+                <Label htmlFor="new-password">New Password</Label>
+                <Input
+                  id="new-password"
+                  type="password"
+                  value={passwordData.newPassword}
+                  onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                  placeholder="Minimum 6 characters"
+                />
+              </div>
+              <div className="grid items-center gap-2">
+                <Label htmlFor="confirm-password">Confirm Password</Label>
+                <Input
+                  id="confirm-password"
+                  type="password"
+                  value={passwordData.confirmPassword}
+                  onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                  placeholder="Confirm new password"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowPasswordDialog(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handlePasswordReset}>
+                Reset Password
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         <Tabs defaultValue="all-users" className="w-full">
           <TabsList className="mb-4">
@@ -346,20 +538,50 @@ const UserManagement = () => {
                           <TableCell>{user.lastLogin}</TableCell>
                           <TableCell className="text-right">
                             <div className="flex justify-end gap-2">
-                              <Button size="icon" variant="ghost" title="Edit user">
+                              <Button 
+                                size="icon" 
+                                variant="ghost" 
+                                title="Edit user"
+                                onClick={() => openEditDialog(user)}
+                              >
                                 <Edit className="h-4 w-4" />
                               </Button>
                               <Button 
                                 size="icon" 
                                 variant="ghost" 
-                                title="Delete user"
-                                onClick={() => handleDeleteUser(user.id, user.name)}
+                                title="Reset password"
+                                onClick={() => openPasswordDialog(user)}
                               >
-                                <Trash2 className="h-4 w-4" />
+                                <KeyRound className="h-4 w-4" />
                               </Button>
-                              <Button size="icon" variant="ghost" title="More options">
-                                <MoreVertical className="h-4 w-4" />
-                              </Button>
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button 
+                                    size="icon" 
+                                    variant="ghost" 
+                                    title="Delete user"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      This action cannot be undone. This will permanently delete the user account for {user.name} and remove their data from the system.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() => handleDeleteUser(user.id, user.name)}
+                                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                    >
+                                      Delete User
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
                             </div>
                           </TableCell>
                         </TableRow>

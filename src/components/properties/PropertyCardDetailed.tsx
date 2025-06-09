@@ -1,11 +1,10 @@
-
 import { Building, MapPin, User, DollarSign, Calendar, PercentIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Property } from "@/types/property";
-import { formatCurrency } from "@/lib/utils";
+import { formatIndianCurrency } from "@/lib/formatCurrency";
 
 interface PropertyCardDetailedProps {
   property: Property;
@@ -62,7 +61,7 @@ export function PropertyCardDetailed({ property, onView }: PropertyCardDetailedP
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="font-medium">{formatCurrency(property.totalAmount)}</div>
+                  <div className="font-medium">{formatIndianCurrency(property.totalAmount)}</div>
                   <div className="text-sm text-muted-foreground">Mem. No: {property.memNo}</div>
                 </div>
               </div>
@@ -99,9 +98,9 @@ export function PropertyCardDetailed({ property, onView }: PropertyCardDetailedP
                     <span className="text-sm">Work Completed: {property.workCompleted}%</span>
                   </div>
                   <div className="text-sm">
-                    <span className="text-green-600">{formatCurrency(property.amountReceived)}</span>
+                    <span className="text-green-600">{formatIndianCurrency(property.amountReceived)}</span>
                     <span className="text-muted-foreground mx-1">/</span>
-                    <span>{formatCurrency(property.totalAmount)}</span>
+                    <span>{formatIndianCurrency(property.totalAmount)}</span>
                   </div>
                 </div>
                 <Progress value={property.workCompleted} className="h-2 mt-1" />
