@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { formatIndianCurrency, formatIndianCurrencyShort } from "@/lib/formatCurrency";
 
 // Sample data
 const recentActivities = [
@@ -51,10 +52,10 @@ const recentActivities = [
 ];
 
 const teamPerformance = [
-  { name: "Emily Davis", position: "Team Lead", sales: 840000, target: 1000000, deals: 4 },
-  { name: "Robert Wilson", position: "Agent", sales: 620000, target: 750000, deals: 3 },
-  { name: "David Thompson", position: "Agent", sales: 520000, target: 750000, deals: 2 },
-  { name: "Lisa Anderson", position: "Agent", sales: 350000, target: 750000, deals: 1 },
+  { name: "Emily Davis", position: "Team Lead", sales: 8400000, target: 10000000, deals: 4 },
+  { name: "Robert Wilson", position: "Agent", sales: 6200000, target: 7500000, deals: 3 },
+  { name: "David Thompson", position: "Agent", sales: 5200000, target: 7500000, deals: 2 },
+  { name: "Lisa Anderson", position: "Agent", sales: 3500000, target: 7500000, deals: 1 },
 ];
 
 const SalesManagerDashboard = () => {
@@ -85,7 +86,7 @@ const SalesManagerDashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           title="Total Sales"
-          value="$2.34M"
+          value={formatIndianCurrencyShort(23400000)}
           trend={{ value: 12.5, isPositive: true }}
           icon={<DollarSign className="h-6 w-6 text-estate-navy" />}
         />
@@ -139,7 +140,7 @@ const SalesManagerDashboard = () => {
                     <p className="text-sm text-muted-foreground">{member.position}</p>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium">${(member.sales / 1000).toFixed(0)}k</p>
+                    <p className="font-medium">{formatIndianCurrencyShort(member.sales)}</p>
                     <p className="text-sm text-muted-foreground">
                       {((member.sales / member.target) * 100).toFixed(0)}% of target
                     </p>
