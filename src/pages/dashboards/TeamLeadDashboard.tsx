@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import StatCard from "@/components/dashboard/StatCard";
 import ActivityFeed from "@/components/dashboard/ActivityFeed";
@@ -103,6 +102,57 @@ const teamMembers = [
 ];
 
 const TeamLeadDashboard = () => {
+  const [siteVisitRequests, setSiteVisitRequests] = useState([
+    {
+      id: "1",
+      customerName: "Rajesh Kumar",
+      phone: "+91 9876543210",
+      email: "rajesh.kumar@email.com",
+      projectName: "Sunrise Residency",
+      preferredDate: "2025-06-18",
+      preferredTime: "10:00",
+      visitors: "2",
+      requirements: "Interested in 2BHK units on higher floors",
+      status: "pending",
+      requestedAt: "2025-06-17 09:30:00"
+    },
+    {
+      id: "2", 
+      customerName: "Priya Sharma",
+      phone: "+91 8765432109",
+      email: "priya.sharma@email.com",
+      projectName: "Metro Heights",
+      preferredDate: "2025-06-19",
+      preferredTime: "14:00",
+      visitors: "1",
+      requirements: "Need parking space details",
+      status: "pending",
+      requestedAt: "2025-06-17 11:15:00"
+    }
+  ]);
+
+  const handleApproveRequest = (requestId: string) => {
+    setSiteVisitRequests(prev => 
+      prev.map(request => 
+        request.id === requestId 
+          ? { ...request, status: "approved" }
+          : request
+      )
+    );
+    console.log("Site visit request approved:", requestId);
+  };
+
+  const handleRejectRequest = (requestId: string) => {
+    setSiteVisitRequests(prev => 
+      prev.map(request => 
+        request.id === requestId 
+          ? { ...request, status: "rejected" }
+          : request
+      )
+    );
+    console.log("Site visit request rejected:", requestId);
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -136,7 +186,81 @@ const TeamLeadDashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 space-y-6">
+          {/* Site Visit Requests */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Public Site Visit Requests</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {siteVisitRequests.filter(req => req.status === "pending").length === 0 ? (
+                <p className="text-center text-muted-foreground py-4">
+                  No pending site visit requests
+                </p>
+              ) : (
+                <div className="space-y-4">
+                  {siteVisitRequests
+                    .filter(req => req.status === "pending")
+                    .map((request) => (
+                      <div key={request.id} className="border rounded-lg p-4">
+                        <div className="flex justify-between items-start mb-3">
+                          <div>
+                            <h4 className="font-medium">{request.customerName}</h4>
+                            <p className="text-sm text-muted-foreground">{request.email}</p>
+                            <p className="text-sm text-muted-foreground">{request.phone}</p>
+                          </div>
+                          <Badge variant="outline" className="text-orange-600 border-orange-600">
+                            Pending Review
+                          </Badge>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-4 mb-3 text-sm">
+                          <div>
+                            <span className="font-medium">Project:</span> {request.projectName}
+                          </div>
+                          <div>
+                            <span className="font-medium">Visitors:</span> {request.visitors} people
+                          </div>
+                          <div>
+                            <span className="font-medium">Preferred Date:</span> {new Date(request.preferredDate).toLocaleDateString()}
+                          </div>
+                          <div>
+                            <span className="font-medium">Preferred Time:</span> {request.preferredTime}
+                          </div>
+                        </div>
+
+                        {request.requirements && (
+                          <div className="mb-3">
+                            <span className="font-medium text-sm">Requirements:</span>
+                            <p className="text-sm text-muted-foreground mt-1">{request.requirements}</p>
+                          </div>
+                        )}
+
+                        <div className="flex justify-end space-x-2">
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="text-red-600 hover:text-red-700"
+                            onClick={() => handleRejectRequest(request.id)}
+                          >
+                            Reject
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            className="bg-estate-navy hover:bg-estate-navy/90"
+                            onClick={() => handleApproveRequest(request.id)}
+                          >
+                            Approve & Assign
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Pending Site Visit Approvals */}
           <Card>
             <CardHeader>
               <CardTitle>Pending Site Visit Approvals</CardTitle>
@@ -177,6 +301,7 @@ const TeamLeadDashboard = () => {
             </CardContent>
           </Card>
         </div>
+        
         <ActivityFeed activities={recentActivities} />
       </div>
 

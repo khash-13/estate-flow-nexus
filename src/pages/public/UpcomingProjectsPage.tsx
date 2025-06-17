@@ -1,9 +1,10 @@
 
+import { Link } from "react-router-dom";
 import PublicLayout from "@/components/layout/PublicLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Calendar, Star, Bell, Gift, Users } from "lucide-react";
+import { MapPin, Calendar, Star, Bell, Gift, Users, Eye } from "lucide-react";
 import EnquiryForm from "@/components/public/EnquiryForm";
 
 const UpcomingProjectsPage = () => {
@@ -162,6 +163,12 @@ const UpcomingProjectsPage = () => {
                     <div className="text-2xl font-bold text-estate-navy mb-4">{project.expectedPrice}</div>
                     
                     <div className="space-y-2">
+                      <Link to={`/project/${project.id}`} className="block">
+                        <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                          <Eye className="mr-2 h-4 w-4" />
+                          View Details
+                        </Button>
+                      </Link>
                       {project.preBooking ? (
                         <Button className="w-full bg-green-600 hover:bg-green-700">
                           Register Interest
