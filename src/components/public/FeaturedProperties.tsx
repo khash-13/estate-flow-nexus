@@ -89,7 +89,7 @@ const FeaturedProperties = () => {
                 </div>
                 
                 <Button className="w-full" asChild>
-                  <Link to={`/public/property/${property.id}`}>
+                  <Link to={`/public/project/${property.id}`}>
                     View Details
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>

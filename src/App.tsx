@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -88,6 +89,7 @@ function App() {
           <Route path="/public/upcoming-projects" element={<UpcomingProjectsPage />} />
           <Route path="/public/open-plots" element={<OpenPlotsPage />} />
           <Route path="/public/contact" element={<ContactPage />} />
+          <Route path="/public/project/:id" element={<ProjectDetailsPage />} />
           
           {/* Admin Routes */}
           <Route path="/login" element={<Login />} />

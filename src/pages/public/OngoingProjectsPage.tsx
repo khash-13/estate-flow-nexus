@@ -163,7 +163,7 @@ const OngoingProjectsPage = () => {
                     <div className="text-2xl font-bold text-green-600 mb-4">{project.price}</div>
                     
                     <div className="space-y-2">
-                      <Link to={`/project/${project.id}`} className="block">
+                      <Link to={`/public/project/${project.id}`} className="block">
                         <Button className="w-full bg-green-600 hover:bg-green-700">
                           <Eye className="mr-2 h-4 w-4" />
                           View Details
