@@ -5,553 +5,325 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Building, Filter, Search, Plus, MapPin, User, PanelLeft, LayoutGrid, CalendarClock, Banknote, CalendarCheck2, SlidersHorizontal, X } from "lucide-react";
-import { toast } from "sonner";
-import { PropertyCardDetailed } from "@/components/properties/PropertyCardDetailed";
-import { PropertyDialog } from "@/components/properties/PropertyDialog";
-import { PropertyDetails } from "@/components/properties/PropertyDetails";
+import { Building2, Filter, Search, MapPin, Home, SlidersHorizontal, X, Calendar, Check } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { Property } from "@/types/property";
+import { Building } from "@/types/building";
+import { formatIndianCurrency } from "@/lib/formatCurrency";
 
-// Sample data similar to the table structure required
-const sampleProperties: Property[] = [{
-  id: "1",
-  memNo: "MEM001",
-  projectName: "Skyline Towers",
-  plotNo: "A-101",
-  villaFacing: "North-East",
-  extent: 1250,
-  propertyType: "Villa",
-  customerName: "John Smith",
-  customerStatus: "Purchased",
-  status: "Sold",
-  contractor: "ABC Builders",
-  siteIncharge: "Robert Engineer",
-  totalAmount: 4500000,
-  workCompleted: 100,
-  deliveryDate: "2023-10-15",
-  emiScheme: true,
-  contactNo: "+91 98765 43210",
-  agentName: "Sarah Johnson",
-  registrationStatus: "Completed",
-  ratePlan: "Premium Plan",
-  amountReceived: 4500000,
-  balanceAmount: 0,
-  remarks: "Handover completed and all documents processed.",
-  municipalPermission: true,
-  googleMapsLocation: "https://maps.google.com/?q=40.7128,-74.0060",
-  thumbnailUrl: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
-}, {
-  id: "2",
-  memNo: "MEM002",
-  projectName: "Parkview Residences",
-  plotNo: "B-202",
-  villaFacing: "South",
-  extent: 1800,
-  propertyType: "Apartment",
-  customerName: "Emily Johnson",
-  customerStatus: "Purchased",
-  status: "Under Construction",
-  contractor: "XYZ Construction",
-  siteIncharge: "Michael Builder",
-  totalAmount: 6500000,
-  workCompleted: 65,
-  deliveryDate: "2024-06-30",
-  emiScheme: true,
-  contactNo: "+91 98765 43211",
-  agentName: "David Wilson",
-  registrationStatus: "Completed",
-  ratePlan: "Luxury Package",
-  amountReceived: 4500000,
-  balanceAmount: 2000000,
-  remarks: "Construction progressing as per schedule.",
-  municipalPermission: true,
-  googleMapsLocation: "https://maps.google.com/?q=34.0522,-118.2437",
-  thumbnailUrl: "https://images.unsplash.com/photo-1564013434775-f71db0030976?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
-}, {
-  id: "3",
-  memNo: "MEM003",
-  projectName: "Riverside Apartments",
-  plotNo: "C-115",
-  villaFacing: "West",
-  extent: 950,
-  propertyType: "Apartment",
-  customerName: "",
-  customerStatus: "Open",
-  status: "Available",
-  contractor: "",
-  siteIncharge: "",
-  totalAmount: 3800000,
-  workCompleted: 90,
-  deliveryDate: "2023-12-15",
-  emiScheme: true,
-  contactNo: "",
-  agentName: "",
-  registrationStatus: "Not Started",
-  ratePlan: "Standard Plan",
-  amountReceived: 0,
-  balanceAmount: 3800000,
-  remarks: "Ready for viewing, showcase unit available.",
-  municipalPermission: true,
-  googleMapsLocation: "https://maps.google.com/?q=41.8781,-87.6298",
-  thumbnailUrl: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
-}, {
-  id: "4",
-  memNo: "MEM004",
-  projectName: "Golden Heights Phase 2",
-  plotNo: "D-405",
-  villaFacing: "North-West",
-  extent: 2200,
-  propertyType: "Villa",
-  customerName: "Michael Brown",
-  customerStatus: "Blocked",
-  status: "Reserved",
-  contractor: "",
-  siteIncharge: "",
-  totalAmount: 8500000,
-  workCompleted: 0,
-  deliveryDate: "2025-03-20",
-  emiScheme: false,
-  contactNo: "+91 98765 43212",
-  agentName: "Jennifer Martinez",
-  registrationStatus: "Pending",
-  ratePlan: "Executive Suite",
-  amountReceived: 850000,
-  balanceAmount: 7650000,
-  remarks: "Booking amount received, awaiting documentation.",
-  municipalPermission: false,
-  googleMapsLocation: "https://maps.google.com/?q=37.7749,-122.4194",
-  thumbnailUrl: "https://images.unsplash.com/photo-1600573472550-8090b5e0745e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
-}, {
-  id: "5",
-  memNo: "MEM005",
-  projectName: "Evergreen Villas",
-  plotNo: "E-88",
-  villaFacing: "South-East",
-  extent: 3000,
-  propertyType: "Villa",
-  customerName: "Robert Davis",
-  customerStatus: "Purchased",
-  status: "Under Construction",
-  contractor: "Premier Builders",
-  siteIncharge: "Jessica Engineer",
-  totalAmount: 12000000,
-  workCompleted: 35,
-  deliveryDate: "2025-01-10",
-  emiScheme: true,
-  contactNo: "+91 98765 43213",
-  agentName: "Thomas Anderson",
-  registrationStatus: "In Progress",
-  ratePlan: "Premium Villa",
-  amountReceived: 4800000,
-  balanceAmount: 7200000,
-  remarks: "Custom interior finishing as per customer request.",
-  municipalPermission: true,
-  googleMapsLocation: "https://maps.google.com/?q=51.5074,-0.1278",
-  thumbnailUrl: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
-}, {
-  id: "6",
-  memNo: "MEM006",
-  projectName: "Central Park Residences",
-  plotNo: "F-77",
-  villaFacing: "North",
-  extent: 1100,
-  propertyType: "Apartment",
-  customerName: "Kevin Martin",
-  customerStatus: "Inquiry",
-  status: "Available",
-  contractor: "",
-  siteIncharge: "",
-  totalAmount: 5200000,
-  workCompleted: 100,
-  deliveryDate: "2023-09-30",
-  emiScheme: false,
-  contactNo: "+91 98765 43214",
-  agentName: "Laura Wilson",
-  registrationStatus: "Not Started",
-  ratePlan: "Urban Living",
-  amountReceived: 0,
-  balanceAmount: 5200000,
-  remarks: "Interested client, follow-up scheduled next week.",
-  municipalPermission: true,
-  googleMapsLocation: "https://maps.google.com/?q=48.8566,2.3522",
-  thumbnailUrl: "https://images.unsplash.com/photo-1460317442991-0ec209397118?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
-}, {
-  id: "7",
-  memNo: "MEM007",
-  projectName: "Lakeside Manor",
-  plotNo: "G-22",
-  villaFacing: "East",
-  extent: 5000,
-  propertyType: "Villa",
-  customerName: "Patricia Williams",
-  customerStatus: "Purchased",
-  status: "Sold",
-  contractor: "Elite Constructions",
-  siteIncharge: "Daniel Project",
-  totalAmount: 22000000,
-  workCompleted: 100,
-  deliveryDate: "2023-05-15",
-  emiScheme: false,
-  contactNo: "+91 98765 43215",
-  agentName: "Christopher Lee",
-  registrationStatus: "Completed",
-  ratePlan: "Luxury Estate",
-  amountReceived: 22000000,
-  balanceAmount: 0,
-  remarks: "Custom landscaping completed as per owner specifications.",
-  municipalPermission: true,
-  googleMapsLocation: "https://maps.google.com/?q=52.5200,13.4050",
-  thumbnailUrl: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
-}, {
-  id: "8",
-  memNo: "MEM008",
-  projectName: "Sunset Apartments",
-  plotNo: "H-56",
-  villaFacing: "West",
-  extent: 1050,
-  propertyType: "Apartment",
-  customerName: "Nancy Taylor",
-  customerStatus: "Purchased",
-  status: "Under Construction",
-  contractor: "Modern Builders",
-  siteIncharge: "Steven Manager",
-  totalAmount: 4950000,
-  workCompleted: 45,
-  deliveryDate: "2024-08-22",
-  emiScheme: true,
-  contactNo: "+91 98765 43216",
-  agentName: "Elizabeth Brown",
-  registrationStatus: "In Progress",
-  ratePlan: "Sunset View",
-  amountReceived: 1980000,
-  balanceAmount: 2970000,
-  remarks: "Construction progressing with custom kitchen upgrades.",
-  municipalPermission: true,
-  googleMapsLocation: "https://maps.google.com/?q=35.6762,139.6503",
-  thumbnailUrl: "https://images.unsplash.com/photo-1567496898669-ee935f5f647a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
-}];
+// Sample buildings data
+const sampleBuildings: Building[] = [
+  {
+    id: "1",
+    projectName: "Skyline Towers",
+    location: "Downtown, Metro City",
+    propertyType: "Apartment Complex",
+    totalUnits: 120,
+    availableUnits: 45,
+    soldUnits: 75,
+    constructionStatus: "Completed",
+    completionDate: "2022-06-15",
+    priceRange: { min: 3500000, max: 10000000 },
+    description: "Luxury apartment complex in the heart of downtown",
+    municipalPermission: true,
+    thumbnailUrl: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    id: "2",
+    projectName: "Parkview Residences",
+    location: "North Hills, Metro City",
+    propertyType: "Apartment Complex",
+    totalUnits: 96,
+    availableUnits: 32,
+    soldUnits: 64,
+    constructionStatus: "Under Construction",
+    completionDate: "2024-06-30",
+    priceRange: { min: 4500000, max: 8500000 },
+    description: "Modern apartments with park views",
+    municipalPermission: true,
+    thumbnailUrl: "https://images.unsplash.com/photo-1564013434775-f71db0030976?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    id: "3",
+    projectName: "Riverside Apartments",
+    location: "River District, Metro City",
+    propertyType: "Apartment Complex",
+    totalUnits: 80,
+    availableUnits: 25,
+    soldUnits: 55,
+    constructionStatus: "Completed",
+    completionDate: "2023-12-15",
+    priceRange: { min: 3000000, max: 5500000 },
+    description: "Peaceful riverside living",
+    municipalPermission: true,
+    thumbnailUrl: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    id: "4",
+    projectName: "Golden Heights Phase 2",
+    location: "West End, Metro City",
+    propertyType: "Villa Complex",
+    totalUnits: 45,
+    availableUnits: 12,
+    soldUnits: 33,
+    constructionStatus: "Under Construction",
+    completionDate: "2025-03-20",
+    priceRange: { min: 8000000, max: 15000000 },
+    description: "Premium villa complex with modern amenities",
+    municipalPermission: false,
+    thumbnailUrl: "https://images.unsplash.com/photo-1600573472550-8090b5e0745e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    id: "5",
+    projectName: "Evergreen Villas",
+    location: "Green Valley, Metro City",
+    propertyType: "Villa Complex",
+    totalUnits: 30,
+    availableUnits: 8,
+    soldUnits: 22,
+    constructionStatus: "Under Construction",
+    completionDate: "2025-01-10",
+    priceRange: { min: 10000000, max: 18000000 },
+    description: "Luxury villas with custom interiors",
+    municipalPermission: true,
+    thumbnailUrl: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    id: "6",
+    projectName: "Central Park Residences",
+    location: "City Center, Metro City",
+    propertyType: "Apartment Complex",
+    totalUnits: 150,
+    availableUnits: 55,
+    soldUnits: 95,
+    constructionStatus: "Completed",
+    completionDate: "2023-09-30",
+    priceRange: { min: 4200000, max: 7500000 },
+    description: "Urban living at its finest",
+    municipalPermission: true,
+    thumbnailUrl: "https://images.unsplash.com/photo-1460317442991-0ec209397118?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
+  }
+];
+
 const Properties = () => {
-  const {
-    user
-  } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
-  // State for properties and UI controls
-  const [properties, setProperties] = useState<Property[]>(sampleProperties);
-  const [filteredProperties, setFilteredProperties] = useState<Property[]>(sampleProperties);
+  // State for buildings and UI controls
+  const [buildings] = useState<Building[]>(sampleBuildings);
+  const [filteredBuildings, setFilteredBuildings] = useState<Building[]>(sampleBuildings);
   const [searchTerm, setSearchTerm] = useState("");
-  const [projectFilter, setProjectFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [customerFilter, setCustomerFilter] = useState("all");
-  const [viewMode, setViewMode] = useState("list"); // list or detail
   const [showFilters, setShowFilters] = useState(false);
 
-  // State for property editing/creating
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [currentProperty, setCurrentProperty] = useState<Property | undefined>(undefined);
-  const [selectedProperty, setSelectedProperty] = useState<Property | undefined>(undefined);
-
-  // Derived state for unique values in dropdown filters
-  const uniqueProjects = Array.from(new Set(properties.map(p => p.projectName)));
   const canEdit = user && ["owner", "admin"].includes(user.role);
 
   // Apply filters whenever filter criteria changes
   useEffect(() => {
-    let results = properties;
+    let results = buildings;
 
     // Apply search filter
     if (searchTerm) {
       const lowercaseSearch = searchTerm.toLowerCase();
-      results = results.filter(property => property.plotNo.toLowerCase().includes(lowercaseSearch) || property.projectName.toLowerCase().includes(lowercaseSearch) || property.memNo.toLowerCase().includes(lowercaseSearch) || property.customerName && property.customerName.toLowerCase().includes(lowercaseSearch));
+      results = results.filter(building => 
+        building.projectName.toLowerCase().includes(lowercaseSearch) || 
+        building.location.toLowerCase().includes(lowercaseSearch)
+      );
     }
 
-    // Apply project filter
-    if (projectFilter !== "all") {
-      results = results.filter(property => property.projectName === projectFilter);
+    // Apply type filter
+    if (typeFilter !== "all") {
+      results = results.filter(building => building.propertyType === typeFilter);
     }
 
     // Apply status filter
     if (statusFilter !== "all") {
-      results = results.filter(property => property.status === statusFilter);
+      results = results.filter(building => building.constructionStatus === statusFilter);
     }
-
-    // Apply customer status filter
-    if (customerFilter !== "all") {
-      results = results.filter(property => property.customerStatus === customerFilter);
-    }
-    setFilteredProperties(results);
-  }, [searchTerm, projectFilter, statusFilter, customerFilter, properties]);
-
-  // Handler for adding/editing properties
-  const handlePropertySubmit = (data: any) => {
-    if (currentProperty) {
-      // Edit existing property
-      const updatedProperties = properties.map(property => property.id === currentProperty.id ? {
-        ...property,
-        ...data,
-        id: property.id
-      } : property);
-      setProperties(updatedProperties);
-      toast.success("Property updated successfully");
-    } else {
-      // Add new property
-      const newProperty = {
-        ...data,
-        id: `${properties.length + 1}`
-      };
-      setProperties([...properties, newProperty]);
-      toast.success("Property added successfully");
-    }
-    setDialogOpen(false);
-    setCurrentProperty(undefined);
-  };
-
-  // Handler for deleting a property
-  const handleDeleteProperty = () => {
-    if (!selectedProperty) return;
-    const updatedProperties = properties.filter(property => property.id !== selectedProperty.id);
-    setProperties(updatedProperties);
-    setSelectedProperty(undefined);
-    toast.success("Property deleted successfully");
-  };
+    
+    setFilteredBuildings(results);
+  }, [searchTerm, typeFilter, statusFilter, buildings]);
 
   // Helper function to clear all filters
   const clearFilters = () => {
     setSearchTerm("");
-    setProjectFilter("all");
+    setTypeFilter("all");
     setStatusFilter("all");
-    setCustomerFilter("all");
   };
 
   // Helper function to determine if any filters are active
   const hasActiveFilters = () => {
-    return searchTerm !== "" || projectFilter !== "all" || statusFilter !== "all" || customerFilter !== "all";
+    return searchTerm !== "" || typeFilter !== "all" || statusFilter !== "all";
   };
-  return <MainLayout>
+
+  const getStatusBadge = (status: string) => {
+    const statusColors: Record<string, string> = {
+      'Completed': 'bg-green-500',
+      'Under Construction': 'bg-yellow-500',
+      'Planned': 'bg-blue-500',
+    };
+
+    return (
+      <Badge className={`${statusColors[status] || 'bg-gray-500'} text-white`}>
+        {status}
+      </Badge>
+    );
+  };
+
+  return (
+    <MainLayout>
       <div className="space-y-6">
-        {/* If a property is selected, show its details */}
-        {selectedProperty ? <PropertyDetails property={selectedProperty} onEdit={() => {
-        setCurrentProperty(selectedProperty);
-        setDialogOpen(true);
-      }} onDelete={handleDeleteProperty} onBack={() => setSelectedProperty(undefined)} /> : <>
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-              <div>
-                <h1 className="text-3xl font-bold flex items-center">
-                  <Building className="mr-2 h-7 w-7" />
-                  Properties
-                </h1>
-                <p className="text-muted-foreground">
-                  Manage and track your real estate portfolio
-                </p>
-              </div>
-              {canEdit && <Button onClick={() => {
-            setCurrentProperty(undefined);
-            setDialogOpen(true);
-          }} className="bg-estate-navy hover:bg-estate-navy/90 text-slate-100 bg-slate-900 hover:bg-slate-800">
-                  <Plus className="mr-2 h-4 w-4" /> Add New Property
-                </Button>}
-            </div>
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold flex items-center">
+              <Building2 className="mr-2 h-7 w-7" />
+              Properties
+            </h1>
+            <p className="text-muted-foreground">
+              Manage buildings and view individual units
+            </p>
+          </div>
+        </div>
 
-            <Card>
-              <CardContent className="p-6">
-                <div className="space-y-4">
-                  {/* Search and main filters */}
-                  <div className="flex flex-col md:flex-row gap-4">
-                    <div className="flex-1 relative">
-                      <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                      <Input placeholder="Search properties by plot no, project, mem. no..." className="pl-8" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
-                    </div>
-                    <div className="flex flex-col sm:flex-row gap-2">
-                      <Select value={projectFilter} onValueChange={setProjectFilter}>
-                        <SelectTrigger className="w-[200px]">
-                          <Building className="mr-2 h-4 w-4" />
-                          <SelectValue placeholder="Project" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All Projects</SelectItem>
-                          {uniqueProjects.map(project => <SelectItem key={project} value={project}>{project}</SelectItem>)}
-                        </SelectContent>
-                      </Select>
-
-                      <Select value={statusFilter} onValueChange={setStatusFilter}>
-                        <SelectTrigger className="w-[200px]">
-                          <Filter className="mr-2 h-4 w-4" />
-                          <SelectValue placeholder="Status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All Statuses</SelectItem>
-                          <SelectItem value="Available">Available</SelectItem>
-                          <SelectItem value="Sold">Sold</SelectItem>
-                          <SelectItem value="Under Construction">Under Construction</SelectItem>
-                          <SelectItem value="Reserved">Reserved</SelectItem>
-                          <SelectItem value="Blocked">Blocked</SelectItem>
-                        </SelectContent>
-                      </Select>
-
-                      <Button variant="outline" className="w-[50px] flex-shrink-0" onClick={() => setShowFilters(!showFilters)}>
-                        <SlidersHorizontal className="h-4 w-4" />
-                      </Button>
-
-                      {hasActiveFilters() && <Button variant="ghost" className="flex-shrink-0" onClick={clearFilters}>
-                          <X className="mr-2 h-4 w-4" /> Clear
-                        </Button>}
-                    </div>
-                  </div>
-
-                  {/* Additional filters section */}
-                  {showFilters && <Card className="bg-muted/50">
-                      <CardContent className="p-4">
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                          <div>
-                            <p className="text-sm font-medium mb-2">Customer Status</p>
-                            <Select value={customerFilter} onValueChange={setCustomerFilter}>
-                              <SelectTrigger>
-                                <User className="mr-2 h-4 w-4" />
-                                <SelectValue placeholder="Customer Status" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="all">All Customers</SelectItem>
-                                <SelectItem value="Purchased">Purchased</SelectItem>
-                                <SelectItem value="Inquiry">Inquiry</SelectItem>
-                                <SelectItem value="Blocked">Blocked</SelectItem>
-                                <SelectItem value="Open">Open</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          {/* Additional filter options could be added here */}
-                        </div>
-                      </CardContent>
-                    </Card>}
-                  
-                  {/* View mode toggle */}
-                  <div className="flex justify-between items-center">
-                    <div className="text-sm text-muted-foreground">
-                      {filteredProperties.length} {filteredProperties.length === 1 ? 'property' : 'properties'} found
-                    </div>
-                    <Tabs value={viewMode} onValueChange={setViewMode} className="w-auto">
-                      <TabsList>
-                        <TabsTrigger value="list" className="flex items-center">
-                          <PanelLeft className="mr-2 h-4 w-4" /> 
-                          List
-                        </TabsTrigger>
-                        <TabsTrigger value="detail" className="flex items-center">
-                          <LayoutGrid className="mr-2 h-4 w-4" />
-                          Details
-                        </TabsTrigger>
-                      </TabsList>
-                    </Tabs>
-                  </div>
+        <Card>
+          <CardContent className="p-6">
+            <div className="space-y-4">
+              {/* Search and main filters */}
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1 relative">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input 
+                    placeholder="Search buildings by name or location..." 
+                    className="pl-8" 
+                    value={searchTerm} 
+                    onChange={e => setSearchTerm(e.target.value)} 
+                  />
                 </div>
-              </CardContent>
-            </Card>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <Select value={typeFilter} onValueChange={setTypeFilter}>
+                    <SelectTrigger className="w-[200px]">
+                      <Building2 className="mr-2 h-4 w-4" />
+                      <SelectValue placeholder="Type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Types</SelectItem>
+                      <SelectItem value="Apartment Complex">Apartment Complex</SelectItem>
+                      <SelectItem value="Villa Complex">Villa Complex</SelectItem>
+                      <SelectItem value="Plot Development">Plot Development</SelectItem>
+                      <SelectItem value="Land Parcel">Land Parcel</SelectItem>
+                    </SelectContent>
+                  </Select>
 
-            {/* Properties listing */}
-            {filteredProperties.length === 0 ? <div className="flex flex-col items-center justify-center py-12">
-                <Building className="h-16 w-16 text-muted-foreground/30 mb-4" />
-                <h3 className="text-xl font-medium">No properties found</h3>
-                <p className="text-muted-foreground">
-                  Try adjusting your search or filters to find properties.
-                </p>
-              </div> : <div className="space-y-4">
-                <Tabs defaultValue="all" className="w-full">
-                  <TabsList className="grid grid-cols-5 mb-4">
-                    <TabsTrigger value="all">All Properties</TabsTrigger>
-                    <TabsTrigger value="available" className="flex items-center">
-                      <Building className="mr-2 h-4 w-4" /> Available
-                    </TabsTrigger>
-                    <TabsTrigger value="construction" className="flex items-center">
-                      <CalendarClock className="mr-2 h-4 w-4" /> Under Construction
-                    </TabsTrigger>
-                    <TabsTrigger value="sold" className="flex items-center">
-                      <Banknote className="mr-2 h-4 w-4" /> Sold
-                    </TabsTrigger>
-                    <TabsTrigger value="upcoming" className="flex items-center">
-                      <CalendarCheck2 className="mr-2 h-4 w-4" /> Upcoming
-                    </TabsTrigger>
-                  </TabsList>
-                  
-                  <TabsContent value="all">
-                    <div className="space-y-4">
-                      {viewMode === "list" ? <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                          {filteredProperties.map(property => <div key={property.id} className="cursor-pointer" onClick={() => setSelectedProperty(property)}>
-                              <div className="relative group">
-                                {/* Thumbnail */}
-                                <div className="relative h-48 overflow-hidden rounded-t-lg">
-                                  {property.thumbnailUrl ? <img src={property.thumbnailUrl} alt={property.projectName} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" /> : <div className="w-full h-full flex items-center justify-center bg-muted">
-                                      <Building className="h-12 w-12 text-muted-foreground/20" />
-                                    </div>}
-                                  
-                                  {/* Status indicator */}
-                                  <div className="absolute top-3 right-3">
-                                    <Badge variant="outline" className={`
-                                      ${property.status === 'Available' ? 'bg-green-500' : property.status === 'Sold' ? 'bg-blue-500' : property.status === 'Under Construction' ? 'bg-yellow-500' : property.status === 'Reserved' ? 'bg-purple-500' : 'bg-red-500'} text-white
-                                    `}>
-                                      {property.status}
-                                    </Badge>
-                                  </div>
-                                </div>
-                                
-                                {/* Info section */}
-                                <div className="p-4 border border-t-0 rounded-b-lg">
-                                  <h3 className="font-medium text-lg">{property.projectName}</h3>
-                                  <div className="flex items-center text-muted-foreground text-sm mt-1">
-                                    <MapPin className="h-3.5 w-3.5 mr-1" />
-                                    <span>Plot {property.plotNo}</span>
-                                  </div>
-                                  <div className="mt-3 flex justify-between items-center">
-                                    <div className="font-medium">${property.totalAmount.toLocaleString()}</div>
-                                    <div className="text-sm text-muted-foreground">Mem. {property.memNo}</div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>)}
-                        </div> : <div className="space-y-4">
-                          {filteredProperties.map(property => <PropertyCardDetailed key={property.id} property={property} onView={() => setSelectedProperty(property)} />)}
-                        </div>}
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="w-[200px]">
+                      <Filter className="mr-2 h-4 w-4" />
+                      <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Statuses</SelectItem>
+                      <SelectItem value="Completed">Completed</SelectItem>
+                      <SelectItem value="Under Construction">Under Construction</SelectItem>
+                      <SelectItem value="Planned">Planned</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  {hasActiveFilters() && (
+                    <Button variant="ghost" className="flex-shrink-0" onClick={clearFilters}>
+                      <X className="mr-2 h-4 w-4" /> Clear
+                    </Button>
+                  )}
+                </div>
+              </div>
+
+              {/* Buildings Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+                {filteredBuildings.map((building) => (
+                  <Card key={building.id} className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate(`/properties/building/${building.id}`)}>
+                    <div className="relative">
+                      {building.thumbnailUrl ? (
+                        <img
+                          src={building.thumbnailUrl}
+                          alt={building.projectName}
+                          className="h-48 w-full object-cover"
+                        />
+                      ) : (
+                        <div className="h-48 w-full bg-muted flex items-center justify-center">
+                          <Building2 className="h-12 w-12 opacity-20" />
+                        </div>
+                      )}
+                      <div className="absolute top-3 right-3">
+                        {getStatusBadge(building.constructionStatus)}
+                      </div>
                     </div>
-                  </TabsContent>
-                  
-                  <TabsContent value="available">
-                    <div className="space-y-4">
-                      {filteredProperties.filter(property => property.status === 'Available').map(property => viewMode === "list" ? <div key={property.id} className="cursor-pointer" onClick={() => setSelectedProperty(property)}>
-                              {/* Reuse the list item structure from above */}
-                            </div> : <PropertyCardDetailed key={property.id} property={property} onView={() => setSelectedProperty(property)} />)}
-                    </div>
-                  </TabsContent>
-                  
-                  <TabsContent value="construction">
-                    <div className="space-y-4">
-                      {filteredProperties.filter(property => property.status === 'Under Construction').map(property => viewMode === "list" ? <div key={property.id} className="cursor-pointer" onClick={() => setSelectedProperty(property)}>
-                              {/* Reuse the list item structure from above */}
-                            </div> : <PropertyCardDetailed key={property.id} property={property} onView={() => setSelectedProperty(property)} />)}
-                    </div>
-                  </TabsContent>
-                  
-                  <TabsContent value="sold">
-                    <div className="space-y-4">
-                      {filteredProperties.filter(property => property.status === 'Sold').map(property => viewMode === "list" ? <div key={property.id} className="cursor-pointer" onClick={() => setSelectedProperty(property)}>
-                              {/* Reuse the list item structure from above */}
-                            </div> : <PropertyCardDetailed key={property.id} property={property} onView={() => setSelectedProperty(property)} />)}
-                    </div>
-                  </TabsContent>
-                  
-                  <TabsContent value="upcoming">
-                    <div className="space-y-4">
-                      {filteredProperties.filter(property => property.status === 'Reserved' || property.status === 'Blocked').map(property => viewMode === "list" ? <div key={property.id} className="cursor-pointer" onClick={() => setSelectedProperty(property)}>
-                              {/* Reuse the list item structure from above */}
-                            </div> : <PropertyCardDetailed key={property.id} property={property} onView={() => setSelectedProperty(property)} />)}
-                    </div>
-                  </TabsContent>
-                </Tabs>
-              </div>}
-          </>}
-        
-        {/* Dialog for creating/editing properties */}
-        <PropertyDialog open={dialogOpen} onOpenChange={setDialogOpen} property={currentProperty} onSubmit={handlePropertySubmit} />
+                    
+                    <CardContent className="p-4">
+                      <h3 className="font-semibold text-lg mb-1">{building.projectName}</h3>
+                      <div className="flex items-center text-sm text-muted-foreground mb-3">
+                        <MapPin className="h-4 w-4 mr-1" />
+                        <span>{building.location}</span>
+                      </div>
+
+                      <div className="space-y-2 mb-4">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Total Units</span>
+                          <span className="font-medium">{building.totalUnits}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Available</span>
+                          <span className="font-medium text-green-600">{building.availableUnits}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Sold</span>
+                          <span className="font-medium text-blue-600">{building.soldUnits}</span>
+                        </div>
+                      </div>
+
+                      <div className="border-t pt-3 space-y-2">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-muted-foreground">Price Range</span>
+                          <span className="font-semibold text-xs">
+                            {formatIndianCurrency(building.priceRange.min)} - {formatIndianCurrency(building.priceRange.max)}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-muted-foreground flex items-center">
+                            <Calendar className="h-4 w-4 mr-1" />
+                            Completion
+                          </span>
+                          <span className="font-medium">{new Date(building.completionDate).toLocaleDateString()}</span>
+                        </div>
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-muted-foreground">Municipal</span>
+                          {building.municipalPermission ? (
+                            <Check className="h-4 w-4 text-green-500" />
+                          ) : (
+                            <X className="h-4 w-4 text-red-500" />
+                          )}
+                        </div>
+                      </div>
+
+                      <Button className="w-full mt-4">
+                        View Building Details
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              {filteredBuildings.length === 0 && (
+                <div className="text-center py-12">
+                  <Building2 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">No buildings found</h3>
+                  <p className="text-muted-foreground">Try adjusting your search or filter criteria</p>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
       </div>
-    </MainLayout>;
+    </MainLayout>
+  );
 };
+
 export default Properties;

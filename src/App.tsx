@@ -10,6 +10,9 @@ import Unauthorized from "./pages/Unauthorized";
 import MessagingPage from "./pages/MessagingPage";
 import Properties from "./pages/Properties";
 import PropertyDetails from "./pages/Properties/PropertyDetails";
+import BuildingDetails from "./pages/BuildingDetails";
+import FloorUnits from "./pages/FloorUnits";
+import UnitDetails from "./pages/UnitDetails";
 import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -100,6 +103,9 @@ function App() {
           
           {/* Property Routes */}
           <Route path="/properties" element={<Properties />} />
+          <Route path="/properties/building/:buildingId" element={<BuildingDetails />} />
+          <Route path="/properties/building/:buildingId/floor/:floorId" element={<FloorUnits />} />
+          <Route path="/properties/unit/:unitId" element={<UnitDetails />} />
           <Route path="/properties/:propertyId" element={<PropertyDetails />} />
           
           {/* CMS Route */}
