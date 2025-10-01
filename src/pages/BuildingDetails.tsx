@@ -13,10 +13,18 @@ import {
   CalendarClock,
   Check,
   X,
-  Map
+  Map,
+  Plus,
+  Pencil,
+  Trash2
 } from "lucide-react";
 import { FloorUnit } from "@/types/building";
 import { formatIndianCurrency } from "@/lib/formatCurrency";
+import { useAuth } from "@/contexts/AuthContext";
+import { BuildingDialog } from "@/components/properties/BuildingDialog";
+import { FloorDialog } from "@/components/properties/FloorDialog";
+import { DeleteConfirmDialog } from "@/components/properties/DeleteConfirmDialog";
+import { toast } from "sonner";
 
 // Sample data - this would come from a database
 const sampleFloorUnits: FloorUnit[] = [
@@ -64,11 +72,11 @@ const sampleBuildings = [
     id: "1",
     projectName: "Skyline Towers",
     location: "Downtown, Metro City",
-    propertyType: "Apartment Complex",
+    propertyType: "Apartment Complex" as const,
     totalUnits: 120,
     availableUnits: 45,
     soldUnits: 75,
-    constructionStatus: "Completed",
+    constructionStatus: "Completed" as const,
     completionDate: "2022-06-15",
     priceRange: { min: 3500000, max: 10000000 },
     description: "Luxury apartment complex in the heart of downtown with stunning city views, modern amenities, and premium finishes.",
@@ -81,9 +89,59 @@ const sampleBuildings = [
 const BuildingDetails = () => {
   const { buildingId } = useParams<{ buildingId: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
   
   const building = sampleBuildings.find(b => b.id === buildingId);
   const floorUnits = sampleFloorUnits.filter(f => f.buildingId === buildingId);
+
+  // Dialog states
+  const [buildingDialogOpen, setBuildingDialogOpen] = useState(false);
+  const [floorDialogOpen, setFloorDialogOpen] = useState(false);
+  const [selectedFloor, setSelectedFloor] = useState<FloorUnit | undefined>();
+  const [dialogMode, setDialogMode] = useState<"add" | "edit">("add");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{ type: "building" | "floor"; id: string } | null>(null);
+
+  const canEdit = user && ["owner", "admin"].includes(user.role);
+
+  const handleEditBuilding = () => {
+    setBuildingDialogOpen(true);
+  };
+
+  const handleDeleteBuilding = () => {
+    setDeleteTarget({ type: "building", id: buildingId! });
+    setDeleteDialogOpen(true);
+  };
+
+  const handleAddFloor = () => {
+    setSelectedFloor(undefined);
+    setDialogMode("add");
+    setFloorDialogOpen(true);
+  };
+
+  const handleEditFloor = (floor: FloorUnit, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedFloor(floor);
+    setDialogMode("edit");
+    setFloorDialogOpen(true);
+  };
+
+  const handleDeleteFloor = (floorId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setDeleteTarget({ type: "floor", id: floorId });
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (deleteTarget?.type === "building") {
+      toast.success("Building deleted successfully");
+      navigate("/properties");
+    } else {
+      toast.success("Floor/Unit deleted successfully");
+    }
+    setDeleteDialogOpen(false);
+    setDeleteTarget(null);
+  };
 
   if (!building) {
     return (
@@ -106,6 +164,18 @@ const BuildingDetails = () => {
             <ChevronLeft className="mr-2 h-4 w-4" />
             Back to Buildings
           </Button>
+          {canEdit && (
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={handleEditBuilding}>
+                <Pencil className="mr-2 h-4 w-4" />
+                Edit Building
+              </Button>
+              <Button variant="destructive" onClick={handleDeleteBuilding}>
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete Building
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Building Header */}
@@ -174,10 +244,18 @@ const BuildingDetails = () => {
         {/* Floors/Units List */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center">
-              <Layers className="mr-2 h-5 w-5" />
-              Floors & Units
-            </CardTitle>
+            <div className="flex justify-between items-center">
+              <CardTitle className="flex items-center">
+                <Layers className="mr-2 h-5 w-5" />
+                Floors & Units
+              </CardTitle>
+              {canEdit && (
+                <Button onClick={handleAddFloor}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Floor/Unit
+                </Button>
+              )}
+            </div>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4">
@@ -185,12 +263,32 @@ const BuildingDetails = () => {
                 <Card key={floor.id} className="hover:shadow-md transition-shadow">
                   <CardContent className="p-6">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <Home className="h-5 w-5 text-muted-foreground" />
-                          <h3 className="text-lg font-semibold">
-                            Floor {floor.floorNumber} - {floor.unitType}
-                          </h3>
+                      <div className="space-y-2 flex-1">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Home className="h-5 w-5 text-muted-foreground" />
+                            <h3 className="text-lg font-semibold">
+                              Floor {floor.floorNumber} - {floor.unitType}
+                            </h3>
+                          </div>
+                          {canEdit && (
+                            <div className="flex gap-1">
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                onClick={(e) => handleEditFloor(floor, e)}
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                onClick={(e) => handleDeleteFloor(floor.id, e)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          )}
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
                           <div>
@@ -251,6 +349,37 @@ const BuildingDetails = () => {
           </Card>
         )}
       </div>
+
+      {building && (
+        <>
+          <BuildingDialog
+            open={buildingDialogOpen}
+            onOpenChange={setBuildingDialogOpen}
+            building={building}
+            mode="edit"
+          />
+
+          <FloorDialog
+            open={floorDialogOpen}
+            onOpenChange={setFloorDialogOpen}
+            floor={selectedFloor}
+            buildingId={buildingId!}
+            mode={dialogMode}
+          />
+
+          <DeleteConfirmDialog
+            open={deleteDialogOpen}
+            onOpenChange={setDeleteDialogOpen}
+            onConfirm={handleDeleteConfirm}
+            title={deleteTarget?.type === "building" ? "Delete Building" : "Delete Floor/Unit"}
+            description={
+              deleteTarget?.type === "building"
+                ? "Are you sure you want to delete this building? This action cannot be undone and will also delete all associated floors and units."
+                : "Are you sure you want to delete this floor/unit? This action cannot be undone and will also delete all associated apartments."
+            }
+          />
+        </>
+      )}
     </MainLayout>
   );
 };

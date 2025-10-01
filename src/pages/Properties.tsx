@@ -6,10 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Building2, Filter, Search, MapPin, Home, SlidersHorizontal, X, Calendar, Check } from "lucide-react";
+import { Building2, Filter, Search, MapPin, Home, SlidersHorizontal, X, Calendar, Check, Plus, Pencil, Trash2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Building } from "@/types/building";
 import { formatIndianCurrency } from "@/lib/formatCurrency";
+import { BuildingDialog } from "@/components/properties/BuildingDialog";
+import { DeleteConfirmDialog } from "@/components/properties/DeleteConfirmDialog";
+import { toast } from "sonner";
 
 // Sample buildings data
 const sampleBuildings: Building[] = [
@@ -116,6 +119,13 @@ const Properties = () => {
   const [typeFilter, setTypeFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [showFilters, setShowFilters] = useState(false);
+  
+  // Dialog states
+  const [buildingDialogOpen, setBuildingDialogOpen] = useState(false);
+  const [selectedBuilding, setSelectedBuilding] = useState<Building | undefined>();
+  const [dialogMode, setDialogMode] = useState<"add" | "edit">("add");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [buildingToDelete, setBuildingToDelete] = useState<string | null>(null);
 
   const canEdit = user && ["owner", "admin"].includes(user.role);
 
@@ -157,6 +167,32 @@ const Properties = () => {
     return searchTerm !== "" || typeFilter !== "all" || statusFilter !== "all";
   };
 
+  const handleAddBuilding = () => {
+    setSelectedBuilding(undefined);
+    setDialogMode("add");
+    setBuildingDialogOpen(true);
+  };
+
+  const handleEditBuilding = (building: Building, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedBuilding(building);
+    setDialogMode("edit");
+    setBuildingDialogOpen(true);
+  };
+
+  const handleDeleteClick = (buildingId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setBuildingToDelete(buildingId);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    // In a real app, this would delete from the database
+    toast.success("Building deleted successfully");
+    setDeleteDialogOpen(false);
+    setBuildingToDelete(null);
+  };
+
   const getStatusBadge = (status: string) => {
     const statusColors: Record<string, string> = {
       'Completed': 'bg-green-500',
@@ -184,6 +220,12 @@ const Properties = () => {
               Manage buildings and view individual units
             </p>
           </div>
+          {canEdit && (
+            <Button onClick={handleAddBuilding}>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Building
+            </Button>
+          )}
         </div>
 
         <Card>
@@ -258,7 +300,27 @@ const Properties = () => {
                     </div>
                     
                     <CardContent className="p-4">
-                      <h3 className="font-semibold text-lg mb-1">{building.projectName}</h3>
+                      <div className="flex justify-between items-start mb-1">
+                        <h3 className="font-semibold text-lg">{building.projectName}</h3>
+                        {canEdit && (
+                          <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              onClick={(e) => handleEditBuilding(building, e)}
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              onClick={(e) => handleDeleteClick(building.id, e)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        )}
+                      </div>
                       <div className="flex items-center text-sm text-muted-foreground mb-3">
                         <MapPin className="h-4 w-4 mr-1" />
                         <span>{building.location}</span>
@@ -322,6 +384,21 @@ const Properties = () => {
           </CardContent>
         </Card>
       </div>
+
+      <BuildingDialog
+        open={buildingDialogOpen}
+        onOpenChange={setBuildingDialogOpen}
+        building={selectedBuilding}
+        mode={dialogMode}
+      />
+
+      <DeleteConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Building"
+        description="Are you sure you want to delete this building? This action cannot be undone and will also delete all associated floors and units."
+      />
     </MainLayout>
   );
 };
