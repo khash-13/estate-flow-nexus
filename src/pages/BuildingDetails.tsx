@@ -16,10 +16,10 @@ import {
   Map,
   Plus,
   Pencil,
-  Trash2
+  Trash2,
+  FileText
 } from "lucide-react";
 import { FloorUnit } from "@/types/building";
-import { formatIndianCurrency } from "@/lib/formatCurrency";
 import { useAuth } from "@/contexts/AuthContext";
 import { BuildingDialog } from "@/components/properties/BuildingDialog";
 import { FloorDialog } from "@/components/properties/FloorDialog";
@@ -34,8 +34,7 @@ const sampleFloorUnits: FloorUnit[] = [
     floorNumber: 1,
     unitType: "2 BHK",
     totalSubUnits: 8,
-    availableSubUnits: 3,
-    priceRange: { min: 3500000, max: 4200000 }
+    availableSubUnits: 3
   },
   {
     id: "f2",
@@ -43,8 +42,7 @@ const sampleFloorUnits: FloorUnit[] = [
     floorNumber: 2,
     unitType: "2 BHK",
     totalSubUnits: 8,
-    availableSubUnits: 5,
-    priceRange: { min: 3600000, max: 4300000 }
+    availableSubUnits: 5
   },
   {
     id: "f3",
@@ -52,8 +50,7 @@ const sampleFloorUnits: FloorUnit[] = [
     floorNumber: 3,
     unitType: "3 BHK",
     totalSubUnits: 6,
-    availableSubUnits: 2,
-    priceRange: { min: 5000000, max: 6000000 }
+    availableSubUnits: 2
   },
   {
     id: "f4",
@@ -61,8 +58,7 @@ const sampleFloorUnits: FloorUnit[] = [
     floorNumber: 4,
     unitType: "Penthouse",
     totalSubUnits: 2,
-    availableSubUnits: 0,
-    priceRange: { min: 8000000, max: 10000000 }
+    availableSubUnits: 0
   },
 ];
 
@@ -78,11 +74,11 @@ const sampleBuildings = [
     soldUnits: 75,
     constructionStatus: "Completed" as const,
     completionDate: "2022-06-15",
-    priceRange: { min: 3500000, max: 10000000 },
     description: "Luxury apartment complex in the heart of downtown with stunning city views, modern amenities, and premium finishes.",
     municipalPermission: true,
     thumbnailUrl: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
-    googleMapsLocation: "https://maps.google.com/?q=40.7128,-74.0060"
+    googleMapsLocation: "https://maps.google.com/?q=40.7128,-74.0060",
+    brochureUrl: null
   }
 ];
 
@@ -237,6 +233,15 @@ const BuildingDetails = () => {
               {building.description && (
                 <p className="mt-4 text-muted-foreground">{building.description}</p>
               )}
+
+              {building.brochureUrl && (
+                <Button variant="outline" asChild className="mt-4">
+                  <a href={building.brochureUrl} target="_blank" rel="noopener noreferrer">
+                    <FileText className="mr-2 h-4 w-4" />
+                    Download Project Brochure
+                  </a>
+                </Button>
+              )}
             </div>
           </div>
         </Card>
@@ -303,12 +308,6 @@ const BuildingDetails = () => {
                             <span className="text-muted-foreground">Sold: </span>
                             <span className="font-medium text-blue-600">{floor.totalSubUnits - floor.availableSubUnits}</span>
                           </div>
-                        </div>
-                        <div className="text-sm">
-                          <span className="text-muted-foreground">Price Range: </span>
-                          <span className="font-semibold">
-                            {formatIndianCurrency(floor.priceRange.min)} - {formatIndianCurrency(floor.priceRange.max)}
-                          </span>
                         </div>
                       </div>
                       <Button 

@@ -26,10 +26,10 @@ const sampleBuildings: Building[] = [
     soldUnits: 75,
     constructionStatus: "Completed",
     completionDate: "2022-06-15",
-    priceRange: { min: 3500000, max: 10000000 },
     description: "Luxury apartment complex in the heart of downtown",
     municipalPermission: true,
-    thumbnailUrl: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
+    thumbnailUrl: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
+    brochureUrl: null
   },
   {
     id: "2",
@@ -41,10 +41,10 @@ const sampleBuildings: Building[] = [
     soldUnits: 64,
     constructionStatus: "Under Construction",
     completionDate: "2024-06-30",
-    priceRange: { min: 4500000, max: 8500000 },
     description: "Modern apartments with park views",
     municipalPermission: true,
-    thumbnailUrl: "https://images.unsplash.com/photo-1564013434775-f71db0030976?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
+    thumbnailUrl: "https://images.unsplash.com/photo-1564013434775-f71db0030976?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
+    brochureUrl: null
   },
   {
     id: "3",
@@ -56,10 +56,10 @@ const sampleBuildings: Building[] = [
     soldUnits: 55,
     constructionStatus: "Completed",
     completionDate: "2023-12-15",
-    priceRange: { min: 3000000, max: 5500000 },
     description: "Peaceful riverside living",
     municipalPermission: true,
-    thumbnailUrl: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
+    thumbnailUrl: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
+    brochureUrl: null
   },
   {
     id: "4",
@@ -71,10 +71,10 @@ const sampleBuildings: Building[] = [
     soldUnits: 33,
     constructionStatus: "Under Construction",
     completionDate: "2025-03-20",
-    priceRange: { min: 8000000, max: 15000000 },
     description: "Premium villa complex with modern amenities",
     municipalPermission: false,
-    thumbnailUrl: "https://images.unsplash.com/photo-1600573472550-8090b5e0745e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
+    thumbnailUrl: "https://images.unsplash.com/photo-1600573472550-8090b5e0745e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
+    brochureUrl: null
   },
   {
     id: "5",
@@ -86,10 +86,10 @@ const sampleBuildings: Building[] = [
     soldUnits: 22,
     constructionStatus: "Under Construction",
     completionDate: "2025-01-10",
-    priceRange: { min: 10000000, max: 18000000 },
     description: "Luxury villas with custom interiors",
     municipalPermission: true,
-    thumbnailUrl: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
+    thumbnailUrl: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
+    brochureUrl: null
   },
   {
     id: "6",
@@ -101,10 +101,10 @@ const sampleBuildings: Building[] = [
     soldUnits: 95,
     constructionStatus: "Completed",
     completionDate: "2023-09-30",
-    priceRange: { min: 4200000, max: 7500000 },
     description: "Urban living at its finest",
     municipalPermission: true,
-    thumbnailUrl: "https://images.unsplash.com/photo-1460317442991-0ec209397118?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
+    thumbnailUrl: "https://images.unsplash.com/photo-1460317442991-0ec209397118?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
+    brochureUrl: null
   }
 ];
 
@@ -342,12 +342,6 @@ const Properties = () => {
                       </div>
 
                       <div className="border-t pt-3 space-y-2">
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-muted-foreground">Price Range</span>
-                          <span className="font-semibold text-xs">
-                            {formatIndianCurrency(building.priceRange.min)} - {formatIndianCurrency(building.priceRange.max)}
-                          </span>
-                        </div>
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-muted-foreground flex items-center">
                             <Calendar className="h-4 w-4 mr-1" />
