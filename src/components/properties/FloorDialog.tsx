@@ -18,10 +18,8 @@ export const FloorDialog = ({ open, onOpenChange, floor, buildingId, mode }: Flo
   const [formData, setFormData] = useState({
     floorNumber: floor?.floorNumber || 1,
     unitType: floor?.unitType || "",
-    totalSubUnits: floor?.totalSubUnits || 0,
-    availableSubUnits: floor?.availableSubUnits || 0,
-    minPrice: floor?.priceRange.min || 0,
-    maxPrice: floor?.priceRange.max || 0
+    totalSubUnits: floor?.totalSubUnits || 1,
+    availableSubUnits: floor?.availableSubUnits || 1
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -46,8 +44,10 @@ export const FloorDialog = ({ open, onOpenChange, floor, buildingId, mode }: Flo
               <Input 
                 id="floorNumber"
                 type="number"
+                min={1}
+                step={1}
                 value={formData.floorNumber}
-                onChange={(e) => setFormData({ ...formData, floorNumber: Number(e.target.value) })}
+                onChange={(e) => setFormData({ ...formData, floorNumber: Math.max(1, Number(e.target.value) || 1) })}
                 required
               />
             </div>
@@ -70,8 +70,10 @@ export const FloorDialog = ({ open, onOpenChange, floor, buildingId, mode }: Flo
               <Input 
                 id="totalSubUnits"
                 type="number"
+                min={1}
+                step={1}
                 value={formData.totalSubUnits}
-                onChange={(e) => setFormData({ ...formData, totalSubUnits: Number(e.target.value) })}
+                onChange={(e) => setFormData({ ...formData, totalSubUnits: Math.max(1, Number(e.target.value) || 1) })}
                 required
               />
             </div>
@@ -81,32 +83,10 @@ export const FloorDialog = ({ open, onOpenChange, floor, buildingId, mode }: Flo
               <Input 
                 id="availableSubUnits"
                 type="number"
+                min={0}
+                step={1}
                 value={formData.availableSubUnits}
-                onChange={(e) => setFormData({ ...formData, availableSubUnits: Number(e.target.value) })}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="minPrice">Min Price (₹) *</Label>
-              <Input 
-                id="minPrice"
-                type="number"
-                value={formData.minPrice}
-                onChange={(e) => setFormData({ ...formData, minPrice: Number(e.target.value) })}
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="maxPrice">Max Price (₹) *</Label>
-              <Input 
-                id="maxPrice"
-                type="number"
-                value={formData.maxPrice}
-                onChange={(e) => setFormData({ ...formData, maxPrice: Number(e.target.value) })}
-                required
+                onChange={(e) => setFormData({ ...formData, availableSubUnits: Math.max(0, Number(e.target.value) || 0) })}
               />
             </div>
           </div>

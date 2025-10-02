@@ -10,7 +10,7 @@ export interface Building {
   soldUnits: number;
   constructionStatus: 'Completed' | 'Under Construction' | 'Planned';
   completionDate: string;
-  priceRange: {
+  priceRange?: {
     min: number;
     max: number;
   };
@@ -19,6 +19,8 @@ export interface Building {
   description?: string;
   municipalPermission: boolean;
   googleMapsLocation?: string;
+  brochureUrl?: string | null;
+  brochureFileId?: string | null;
 }
 
 export interface FloorUnit {
@@ -28,7 +30,7 @@ export interface FloorUnit {
   unitType: string; // e.g., "1 BHK", "2 BHK", "Villa"
   totalSubUnits: number;
   availableSubUnits: number;
-  priceRange: {
+  priceRange?: {
     min: number;
     max: number;
   };

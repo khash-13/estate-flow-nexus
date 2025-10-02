@@ -9,6 +9,15 @@ export type RegistrationStatus = 'Completed' | 'In Progress' | 'Pending' | 'Not 
 
 export type PropertyType = 'Villa' | 'Apartment' | 'Plot' | 'Land Parcel';
 
+export interface PropertyDocument {
+  id: string;
+  title: string;
+  fileUrl: string;
+  mimeType: string;
+  visibility: "PURCHASER_ONLY" | "PUBLIC_ENQUIRER";
+  createdAt?: string;
+}
+
 export interface Property {
   id: string;
   memNo: string;
@@ -37,4 +46,6 @@ export interface Property {
   googleMapsLocation?: string;
   thumbnailUrl?: string;
   images?: string[];
+  documents?: PropertyDocument[];
+  purchasedCustomerId?: string | null;
 }

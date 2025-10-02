@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,8 +6,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Property } from "@/types/property";
+import { Badge } from "@/components/ui/badge";
+import { Property, PropertyDocument } from "@/types/property";
 import { toast } from "sonner";
+import { X, Upload } from "lucide-react";
 
 interface ApartmentDialogProps {
   open: boolean;
@@ -25,16 +27,96 @@ export const ApartmentDialog = ({ open, onOpenChange, apartment, mode }: Apartme
     propertyType: apartment?.propertyType || "Apartment",
     status: apartment?.status || "Available",
     totalAmount: apartment?.totalAmount || 0,
+    amountReceived: apartment?.amountReceived || 0,
+    balanceAmount: apartment?.balanceAmount || 0,
     ratePlan: apartment?.ratePlan || "",
     deliveryDate: apartment?.deliveryDate || "",
     emiScheme: apartment?.emiScheme || false,
     municipalPermission: apartment?.municipalPermission || false,
     remarks: apartment?.remarks || "",
-    thumbnailUrl: apartment?.thumbnailUrl || ""
+    thumbnailUrl: apartment?.thumbnailUrl || "",
+    documents: apartment?.documents || [] as PropertyDocument[]
   });
+
+  const [errors, setErrors] = useState({
+    memNo: "",
+    plotNo: "",
+    totalAmount: ""
+  });
+
+  // Auto-calculate balance amount
+  useEffect(() => {
+    const balance = Math.max(0, formData.totalAmount - formData.amountReceived);
+    setFormData(prev => ({ ...prev, balanceAmount: balance }));
+  }, [formData.totalAmount, formData.amountReceived]);
+
+  const validateAlphanumeric = (value: string, field: string) => {
+    const pattern = /^[a-zA-Z0-9\-_\/]+$/;
+    if (!value) {
+      setErrors(prev => ({ ...prev, [field]: `${field === 'memNo' ? 'Membership' : 'Plot'} number is required` }));
+      return false;
+    }
+    if (!pattern.test(value)) {
+      setErrors(prev => ({ ...prev, [field]: "Only letters, numbers, -, _, and / allowed" }));
+      return false;
+    }
+    setErrors(prev => ({ ...prev, [field]: "" }));
+    return true;
+  };
+
+  const handleDocumentUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    const validFiles = files.filter(f => 
+      f.type === "application/pdf" || f.type.startsWith("image/")
+    );
+    
+    if (validFiles.length !== files.length) {
+      toast.error("Only PDF and image files are allowed");
+      return;
+    }
+
+    const newDocs: PropertyDocument[] = validFiles.map(f => ({
+      id: Math.random().toString(36).substring(7),
+      title: f.name,
+      fileUrl: URL.createObjectURL(f),
+      mimeType: f.type,
+      visibility: "PURCHASER_ONLY",
+      createdAt: new Date().toISOString()
+    }));
+
+    setFormData(prev => ({
+      ...prev,
+      documents: [...prev.documents, ...newDocs]
+    }));
+    toast.success(`${validFiles.length} document(s) uploaded`);
+  };
+
+  const removeDocument = (docId: string) => {
+    setFormData(prev => ({
+      ...prev,
+      documents: prev.documents.filter(d => d.id !== docId)
+    }));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate alphanumeric fields
+    const memNoValid = validateAlphanumeric(formData.memNo, "memNo");
+    const plotNoValid = validateAlphanumeric(formData.plotNo, "plotNo");
+    
+    // Validate total amount is positive
+    if (formData.totalAmount <= 0) {
+      setErrors(prev => ({ ...prev, totalAmount: "Total amount must be greater than 0" }));
+      return;
+    } else {
+      setErrors(prev => ({ ...prev, totalAmount: "" }));
+    }
+
+    if (!memNoValid || !plotNoValid) {
+      toast.error("Please fix validation errors");
+      return;
+    }
     
     // In a real app, this would save to the database
     toast.success(mode === "add" ? "Unit created successfully" : "Unit updated successfully");
@@ -55,9 +137,17 @@ export const ApartmentDialog = ({ open, onOpenChange, apartment, mode }: Apartme
               <Input 
                 id="memNo"
                 value={formData.memNo}
-                onChange={(e) => setFormData({ ...formData, memNo: e.target.value })}
+                onChange={(e) => {
+                  setFormData({ ...formData, memNo: e.target.value });
+                  validateAlphanumeric(e.target.value, "memNo");
+                }}
+                onBlur={(e) => validateAlphanumeric(e.target.value, "memNo")}
+                pattern="^[a-zA-Z0-9\-_\/]+$"
+                className={errors.memNo ? "border-red-500" : ""}
                 required
               />
+              {errors.memNo && <p className="text-sm text-red-500">{errors.memNo}</p>}
+              <p className="text-xs text-muted-foreground">Only letters, numbers, -, _, / allowed</p>
             </div>
             
             <div className="space-y-2">
@@ -65,9 +155,17 @@ export const ApartmentDialog = ({ open, onOpenChange, apartment, mode }: Apartme
               <Input 
                 id="plotNo"
                 value={formData.plotNo}
-                onChange={(e) => setFormData({ ...formData, plotNo: e.target.value })}
+                onChange={(e) => {
+                  setFormData({ ...formData, plotNo: e.target.value });
+                  validateAlphanumeric(e.target.value, "plotNo");
+                }}
+                onBlur={(e) => validateAlphanumeric(e.target.value, "plotNo")}
+                pattern="^[a-zA-Z0-9\-_\/]+$"
+                className={errors.plotNo ? "border-red-500" : ""}
                 required
               />
+              {errors.plotNo && <p className="text-sm text-red-500">{errors.plotNo}</p>}
+              <p className="text-xs text-muted-foreground">Only letters, numbers, -, _, / allowed</p>
             </div>
           </div>
 
@@ -77,8 +175,10 @@ export const ApartmentDialog = ({ open, onOpenChange, apartment, mode }: Apartme
               <Input 
                 id="extent"
                 type="number"
+                min={1}
+                step="0.01"
                 value={formData.extent}
-                onChange={(e) => setFormData({ ...formData, extent: Number(e.target.value) })}
+                onChange={(e) => setFormData({ ...formData, extent: Math.max(1, Number(e.target.value) || 1) })}
                 required
               />
             </div>
@@ -137,33 +237,67 @@ export const ApartmentDialog = ({ open, onOpenChange, apartment, mode }: Apartme
               <Input 
                 id="totalAmount"
                 type="number"
+                min={1}
+                step="0.01"
                 value={formData.totalAmount}
-                onChange={(e) => setFormData({ ...formData, totalAmount: Number(e.target.value) })}
+                onChange={(e) => {
+                  const value = Math.max(1, Number(e.target.value) || 0);
+                  setFormData({ ...formData, totalAmount: value });
+                  if (value > 0) {
+                    setErrors(prev => ({ ...prev, totalAmount: "" }));
+                  }
+                }}
+                className={errors.totalAmount ? "border-red-500" : ""}
                 required
               />
+              {errors.totalAmount && <p className="text-sm text-red-500">{errors.totalAmount}</p>}
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="amountReceived">Advance Received (₹)</Label>
+              <Input 
+                id="amountReceived"
+                type="number"
+                min={0}
+                step="0.01"
+                value={formData.amountReceived}
+                onChange={(e) => setFormData({ ...formData, amountReceived: Math.max(0, Number(e.target.value) || 0) })}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="balanceAmount">Balance Payment (₹)</Label>
+              <Input 
+                id="balanceAmount"
+                type="number"
+                value={formData.balanceAmount}
+                readOnly
+                className="bg-muted"
+              />
+              <p className="text-xs text-muted-foreground">Auto-calculated</p>
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="ratePlan">Rate Plan</Label>
               <Input 
                 id="ratePlan"
                 value={formData.ratePlan}
                 onChange={(e) => setFormData({ ...formData, ratePlan: e.target.value })}
-                placeholder="e.g., Standard Plan, Premium Plan"
+                placeholder="e.g., Standard Plan"
               />
             </div>
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="deliveryDate">Expected Delivery Date</Label>
-              <Input 
-                id="deliveryDate"
-                type="date"
-                value={formData.deliveryDate}
-                onChange={(e) => setFormData({ ...formData, deliveryDate: e.target.value })}
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="deliveryDate">Expected Delivery Date</Label>
+            <Input 
+              id="deliveryDate"
+              type="date"
+              value={formData.deliveryDate}
+              onChange={(e) => setFormData({ ...formData, deliveryDate: e.target.value })}
+            />
           </div>
 
           <div className="space-y-2">
@@ -184,6 +318,47 @@ export const ApartmentDialog = ({ open, onOpenChange, apartment, mode }: Apartme
               onChange={(e) => setFormData({ ...formData, remarks: e.target.value })}
               rows={3}
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="documents">Unit Documents (PDF/Images)</Label>
+            <div className="flex items-center gap-2">
+              <input 
+                id="documents"
+                type="file"
+                accept="application/pdf,image/*"
+                multiple
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                onChange={handleDocumentUpload}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Documents are visible only to purchaser (and admin/owner)
+            </p>
+            
+            {formData.documents.length > 0 && (
+              <div className="mt-2 space-y-2">
+                {formData.documents.map(doc => (
+                  <div key={doc.id} className="flex items-center justify-between p-2 border rounded-md">
+                    <div className="flex items-center gap-2">
+                      <Upload className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm">{doc.title}</span>
+                      <Badge variant="outline" className="text-xs">
+                        {doc.visibility === "PURCHASER_ONLY" ? "Purchaser Only" : "Public"}
+                      </Badge>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeDocument(doc.id)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="flex items-center space-x-4">

@@ -15,7 +15,8 @@ import {
   User, 
   MessageSquare,
   ChevronLeft,
-  X
+  X,
+  Download
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -32,6 +33,7 @@ import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/AuthContext";
 import { Property } from "@/types/property";
 import { formatIndianCurrency } from "@/lib/formatCurrency";
+import { canViewPurchaserOnlyDoc } from "@/lib/rbac";
 
 // Helper to render status badges with appropriate colors
 function getStatusBadge(status: string) {
@@ -316,6 +318,50 @@ export function PropertyDetails({
             </CardContent>
           </Card>
         </div>
+
+        {/* Unit Documents Section */}
+        {property.documents && property.documents.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-xl flex items-center">
+                <FileText className="mr-2 h-5 w-5" />
+                Unit Documents
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {canViewPurchaserOnlyDoc(user, property) ? (
+                <div className="space-y-2">
+                  {property.documents.map(doc => (
+                    <div key={doc.id} className="flex items-center justify-between p-3 border rounded-md hover:bg-muted/50 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <Download className="h-5 w-5 text-muted-foreground" />
+                        <div>
+                          <p className="font-medium">{doc.title}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {doc.mimeType.includes('pdf') ? 'PDF Document' : 'Image'}
+                          </p>
+                        </div>
+                      </div>
+                      <Button variant="outline" size="sm" asChild>
+                        <a href={doc.fileUrl} target="_blank" rel="noopener noreferrer">
+                          <Download className="mr-2 h-4 w-4" />
+                          Download
+                        </a>
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <FileText className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                  <p className="text-sm">
+                    Unit documents are visible only to the purchased customer.
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {/* Google Maps Integration if available */}
         {property.googleMapsLocation && (

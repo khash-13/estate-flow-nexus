@@ -21,17 +21,14 @@ export const BuildingDialog = ({ open, onOpenChange, building, mode }: BuildingD
     projectName: building?.projectName || "",
     location: building?.location || "",
     propertyType: building?.propertyType || "Apartment Complex",
-    totalUnits: building?.totalUnits || 0,
-    availableUnits: building?.availableUnits || 0,
-    soldUnits: building?.soldUnits || 0,
+    totalUnits: building?.totalUnits || 1,
     constructionStatus: building?.constructionStatus || "Planned",
     completionDate: building?.completionDate || "",
-    minPrice: building?.priceRange.min || 0,
-    maxPrice: building?.priceRange.max || 0,
     description: building?.description || "",
     municipalPermission: building?.municipalPermission || false,
     googleMapsLocation: building?.googleMapsLocation || "",
-    thumbnailUrl: building?.thumbnailUrl || ""
+    thumbnailUrl: building?.thumbnailUrl || "",
+    brochureUrl: building?.brochureUrl || ""
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -109,58 +106,20 @@ export const BuildingDialog = ({ open, onOpenChange, building, mode }: BuildingD
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="totalUnits">Total Units</Label>
-              <Input 
-                id="totalUnits"
-                type="number"
-                value={formData.totalUnits}
-                onChange={(e) => setFormData({ ...formData, totalUnits: Number(e.target.value) })}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="availableUnits">Available Units</Label>
-              <Input 
-                id="availableUnits"
-                type="number"
-                value={formData.availableUnits}
-                onChange={(e) => setFormData({ ...formData, availableUnits: Number(e.target.value) })}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="soldUnits">Sold Units</Label>
-              <Input 
-                id="soldUnits"
-                type="number"
-                value={formData.soldUnits}
-                onChange={(e) => setFormData({ ...formData, soldUnits: Number(e.target.value) })}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="minPrice">Min Price (₹)</Label>
-              <Input 
-                id="minPrice"
-                type="number"
-                value={formData.minPrice}
-                onChange={(e) => setFormData({ ...formData, minPrice: Number(e.target.value) })}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="maxPrice">Max Price (₹)</Label>
-              <Input 
-                id="maxPrice"
-                type="number"
-                value={formData.maxPrice}
-                onChange={(e) => setFormData({ ...formData, maxPrice: Number(e.target.value) })}
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="totalUnits">Total Units *</Label>
+            <Input 
+              id="totalUnits"
+              type="number"
+              min={1}
+              step={1}
+              value={formData.totalUnits}
+              onChange={(e) => setFormData({ ...formData, totalUnits: Math.max(1, Math.floor(Number(e.target.value) || 1)) })}
+              required
+            />
+            <p className="text-sm text-muted-foreground">
+              Units will be auto-created when saving. Display-only counts shown elsewhere.
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -201,6 +160,32 @@ export const BuildingDialog = ({ open, onOpenChange, building, mode }: BuildingD
               onChange={(e) => setFormData({ ...formData, googleMapsLocation: e.target.value })}
               placeholder="https://maps.google.com/..."
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="brochure">Project Brochure (PDF)</Label>
+            <input 
+              id="brochure"
+              type="file"
+              accept="application/pdf"
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                if (file.type !== "application/pdf") {
+                  toast.error("Please upload a PDF file");
+                  return;
+                }
+                const url = URL.createObjectURL(file);
+                setFormData({ ...formData, brochureUrl: url });
+                toast.success("Brochure uploaded successfully");
+              }}
+            />
+            {formData.brochureUrl && (
+              <p className="text-sm text-muted-foreground">
+                ✓ Brochure uploaded (shareable to enquirers)
+              </p>
+            )}
           </div>
 
           <div className="flex items-center space-x-2">
