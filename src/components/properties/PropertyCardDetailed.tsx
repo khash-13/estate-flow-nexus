@@ -1,4 +1,4 @@
-import { Building, MapPin, User, DollarSign, Calendar, PercentIcon } from "lucide-react";
+import { Building, MapPin, User, DollarSign, Calendar, PercentIcon, Download } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -106,9 +106,18 @@ export function PropertyCardDetailed({ property, onView }: PropertyCardDetailedP
                 <Progress value={property.workCompleted} className="h-2 mt-1" />
               </div>
               
-              <Button className="w-full" onClick={() => onView(property.id)}>
-                View Property Details
-              </Button>
+              <div className="flex gap-2">
+                <Button className="flex-1" onClick={() => onView(property.id)}>
+                  View Property Details
+                </Button>
+                {property.brochureUrl && (
+                  <Button variant="outline" asChild>
+                    <a href={property.brochureUrl} target="_blank" rel="noopener noreferrer" download>
+                      <Download className="h-4 w-4" />
+                    </a>
+                  </Button>
+                )}
+              </div>
             </div>
           </CardContent>
         </div>

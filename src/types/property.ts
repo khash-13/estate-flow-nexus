@@ -52,4 +52,5 @@ export interface Property {
   images?: string[];
   documents?: PropertyDocument[];
   purchasedCustomerId?: string | null;
+  brochureUrl?: string;
 }
