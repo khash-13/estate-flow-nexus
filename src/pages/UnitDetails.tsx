@@ -36,7 +36,8 @@ const sampleApartment: Property = {
   remarks: "Handover completed and all documents processed.",
   municipalPermission: true,
   googleMapsLocation: "https://maps.google.com/?q=40.7128,-74.0060",
-  thumbnailUrl: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+  thumbnailUrl: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+  brochureUrl: "https://example.com/brochures/skyline-towers.pdf"
 };
 
 const UnitDetails = () => {

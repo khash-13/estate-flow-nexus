@@ -264,6 +264,19 @@ export function PropertyDetails({
                   </p>
                 </div>
 
+                {/* Property Brochure */}
+                {property.brochureUrl && (
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">Property Brochure</p>
+                    <Button variant="outline" size="sm" asChild className="w-full">
+                      <a href={property.brochureUrl} target="_blank" rel="noopener noreferrer" download>
+                        <Download className="mr-2 h-4 w-4" />
+                        Download Brochure
+                      </a>
+                    </Button>
+                  </div>
+                )}
+
                 {/* Unit Documents for Purchased Customer */}
                 {property.documents && property.documents.length > 0 && (
                   <>
