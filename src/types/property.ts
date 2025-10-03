@@ -28,6 +28,10 @@ export interface Property {
   propertyType: PropertyType;
   customerName: string;
   customerStatus: CustomerStatus;
+  enquiryCustomerName?: string;
+  enquiryCustomerContact?: string;
+  purchasedCustomerName?: string;
+  purchasedCustomerContact?: string;
   status: PropertyStatus;
   contractor?: string;
   siteIncharge?: string;

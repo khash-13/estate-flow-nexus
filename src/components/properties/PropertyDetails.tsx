@@ -74,7 +74,8 @@ export function PropertyDetails({
 }: PropertyDetailsProps) {
   const { user } = useAuth();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const canEdit = user && ["owner", "admin"].includes(user.role);
+  const canEdit = user && ["owner", "admin", "sales_manager", "team_lead"].includes(user.role);
+  const canDelete = user && ["owner", "admin"].includes(user.role);
 
   // Format the date string to a readable format
   const formatDate = (dateString: string) => {
@@ -101,10 +102,12 @@ export function PropertyDetails({
                 <Edit className="mr-2 h-4 w-4" />
                 Edit
               </Button>
-              <Button size="sm" variant="destructive" onClick={() => setDeleteDialogOpen(true)}>
-                <Trash className="mr-2 h-4 w-4" />
-                Delete
-              </Button>
+              {canDelete && (
+                <Button size="sm" variant="destructive" onClick={() => setDeleteDialogOpen(true)}>
+                  <Trash className="mr-2 h-4 w-4" />
+                  Delete
+                </Button>
+              )}
             </div>
           )}
         </div>
@@ -193,6 +196,30 @@ export function PropertyDetails({
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">Agent Name</p>
                   <p className="font-medium">{property.agentName || 'N/A'}</p>
+                </div>
+                
+                <Separator />
+                
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">Enquiry Customer</p>
+                  <p className="font-medium">{property.enquiryCustomerName || 'N/A'}</p>
+                  {property.enquiryCustomerContact && (
+                    <p className="text-sm flex items-center">
+                      <Phone className="mr-2 h-3 w-3 text-muted-foreground" />
+                      {property.enquiryCustomerContact}
+                    </p>
+                  )}
+                </div>
+                
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">Purchased Customer</p>
+                  <p className="font-medium">{property.purchasedCustomerName || 'N/A'}</p>
+                  {property.purchasedCustomerContact && (
+                    <p className="text-sm flex items-center">
+                      <Phone className="mr-2 h-3 w-3 text-muted-foreground" />
+                      {property.purchasedCustomerContact}
+                    </p>
+                  )}
                 </div>
               </div>
             </CardContent>

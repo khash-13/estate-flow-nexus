@@ -7,9 +7,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { Property, PropertyDocument } from "@/types/property";
 import { toast } from "sonner";
 import { X, Upload } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface ApartmentDialogProps {
   open: boolean;
@@ -19,6 +21,9 @@ interface ApartmentDialogProps {
 }
 
 export const ApartmentDialog = ({ open, onOpenChange, apartment, mode }: ApartmentDialogProps) => {
+  const { user } = useAuth();
+  const canEditCustomerDetails = user && ["owner", "admin", "sales_manager", "team_lead"].includes(user.role);
+  
   const [formData, setFormData] = useState({
     memNo: apartment?.memNo || "",
     plotNo: apartment?.plotNo || "",
@@ -35,7 +40,11 @@ export const ApartmentDialog = ({ open, onOpenChange, apartment, mode }: Apartme
     municipalPermission: apartment?.municipalPermission || false,
     remarks: apartment?.remarks || "",
     thumbnailUrl: apartment?.thumbnailUrl || "",
-    documents: apartment?.documents || [] as PropertyDocument[]
+    documents: apartment?.documents || [] as PropertyDocument[],
+    enquiryCustomerName: apartment?.enquiryCustomerName || "",
+    enquiryCustomerContact: apartment?.enquiryCustomerContact || "",
+    purchasedCustomerName: apartment?.purchasedCustomerName || "",
+    purchasedCustomerContact: apartment?.purchasedCustomerContact || ""
   });
 
   const [errors, setErrors] = useState({
@@ -319,6 +328,68 @@ export const ApartmentDialog = ({ open, onOpenChange, apartment, mode }: Apartme
               rows={3}
             />
           </div>
+
+          {/* Customer Details Section */}
+          <Separator className="my-6" />
+          <h3 className="text-lg font-semibold mb-4">Customer Details</h3>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="enquiryCustomerName">Enquiry Customer Name</Label>
+              <Input 
+                id="enquiryCustomerName"
+                value={formData.enquiryCustomerName}
+                onChange={(e) => setFormData({ ...formData, enquiryCustomerName: e.target.value })}
+                placeholder="Enter customer name"
+                disabled={!canEditCustomerDetails}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="enquiryCustomerContact">Enquiry Customer Contact</Label>
+              <Input 
+                id="enquiryCustomerContact"
+                type="tel"
+                value={formData.enquiryCustomerContact}
+                onChange={(e) => setFormData({ ...formData, enquiryCustomerContact: e.target.value })}
+                placeholder="+91 XXXXX XXXXX"
+                disabled={!canEditCustomerDetails}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="purchasedCustomerName">Purchased Customer Name</Label>
+              <Input 
+                id="purchasedCustomerName"
+                value={formData.purchasedCustomerName}
+                onChange={(e) => setFormData({ ...formData, purchasedCustomerName: e.target.value })}
+                placeholder="Enter customer name"
+                disabled={!canEditCustomerDetails}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="purchasedCustomerContact">Purchased Customer Contact</Label>
+              <Input 
+                id="purchasedCustomerContact"
+                type="tel"
+                value={formData.purchasedCustomerContact}
+                onChange={(e) => setFormData({ ...formData, purchasedCustomerContact: e.target.value })}
+                placeholder="+91 XXXXX XXXXX"
+                disabled={!canEditCustomerDetails}
+              />
+            </div>
+          </div>
+
+          {!canEditCustomerDetails && (
+            <p className="text-xs text-muted-foreground mt-2">
+              Only admins, owners, sales managers, and team leads can edit customer details.
+            </p>
+          )}
+
+          <Separator className="my-6" />
 
           <div className="space-y-2">
             <Label htmlFor="documents">Unit Documents (PDF/Images)</Label>
