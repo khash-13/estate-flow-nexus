@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Building2, Filter, Search, MapPin, Home, SlidersHorizontal, X, Calendar, Check, Plus, Pencil, Trash2 } from "lucide-react";
+import { Building2, Filter, Search, MapPin, Home, SlidersHorizontal, X, Calendar, Check, Plus, Pencil, Trash2, Download, Share2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Building } from "@/types/building";
 import { formatIndianCurrency } from "@/lib/formatCurrency";
@@ -29,7 +29,7 @@ const sampleBuildings: Building[] = [
     description: "Luxury apartment complex in the heart of downtown",
     municipalPermission: true,
     thumbnailUrl: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
-    brochureUrl: null
+    brochureUrl: "https://example.com/brochures/skyline-towers.pdf"
   },
   {
     id: "2",
@@ -44,7 +44,7 @@ const sampleBuildings: Building[] = [
     description: "Modern apartments with park views",
     municipalPermission: true,
     thumbnailUrl: "https://images.unsplash.com/photo-1564013434775-f71db0030976?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
-    brochureUrl: null
+    brochureUrl: "https://example.com/brochures/parkview-residences.pdf"
   },
   {
     id: "3",
@@ -356,14 +356,52 @@ const Properties = () => {
                           ) : (
                             <X className="h-4 w-4 text-red-500" />
                           )}
-                        </div>
                       </div>
+                    </div>
 
-                      <Button className="w-full mt-4">
-                        View Building Details
+                    <div className="flex gap-2 mt-4">
+                      <Button className="flex-1" onClick={() => navigate(`/properties/building/${building.id}`)}>
+                        View Details
                       </Button>
-                    </CardContent>
-                  </Card>
+                      {building.brochureUrl && (
+                        <>
+                          <Button 
+                            variant="outline" 
+                            size="icon"
+                            asChild
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <a href={building.brochureUrl} target="_blank" rel="noopener noreferrer" download>
+                              <Download className="h-4 w-4" />
+                            </a>
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="icon"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (navigator.share && building.brochureUrl) {
+                                navigator.share({
+                                  title: `${building.projectName} Brochure`,
+                                  text: `Check out the brochure for ${building.projectName}`,
+                                  url: building.brochureUrl,
+                                }).catch(() => {
+                                  navigator.clipboard.writeText(building.brochureUrl);
+                                  toast.success("Brochure link copied to clipboard");
+                                });
+                              } else if (building.brochureUrl) {
+                                navigator.clipboard.writeText(building.brochureUrl);
+                                toast.success("Brochure link copied to clipboard");
+                              }
+                            }}
+                          >
+                            <Share2 className="h-4 w-4" />
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
                 ))}
               </div>
 
